@@ -1,0 +1,470 @@
+<title>Renewal Benchmark</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=Source+Sans+3:wght@400;500;600&display=swap">
+<style>
+/* Layout: pick a company like yours, then read its renewal in three steps. 1 the bundled invoice, 2 the x-ray of its parts, 3 a TriNet benchmark with ROI and findings. */
+:root {
+  --paper: #f5f7f8;
+  --sheet: #ffffff;
+  --ink: #17212a;
+  --muted: #5b6772;
+  --rule: #dde2e7;
+  --film: #0b1a24;          /* x-ray panel, both themes */
+  --film-ink: #d9eef6;
+  --film-muted: #87a6b5;
+  --film-rule: #1c3443;
+  --scan: #5fd6f5;
+  --up: #d9694d;            /* increases */
+  --save: #1f8a5b;          /* savings, the benchmark */
+  --save-bg: #e2f4ea;
+  --c1: #5fd6f5; --c2: #f0b54a; --c3: #9a8cf0; --c4: #6fcf97; --c5: #e57fa8;
+  --chip-neg: #1f7a52; --chip-neg-bg: #e3f4ea;
+  --chip-shop: #8a5a00; --chip-shop-bg: #fbefd6;
+  --chip-law: #4c5866; --chip-law-bg: #e9edf1;
+  --warn-bg: #fff4dc; --warn-ink: #7a5300;
+  --display: "IBM Plex Sans Condensed", "Arial Narrow", "Roboto Condensed", sans-serif;
+  --body: "Source Sans 3", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #0f1418; --sheet: #172027; --ink: #e8edf1; --muted: #98a4ae; --rule: #26313a;
+    --film: #071219; --film-rule: #183140; --up: #f08a70; --save: #6fd8a0; --save-bg: #12321f;
+    --chip-neg: #8fe0b4; --chip-neg-bg: #143525; --chip-shop: #f3cb7a; --chip-shop-bg: #3a2c0e; --chip-law: #b8c3cd; --chip-law-bg: #24303a;
+    --warn-bg: #33270b; --warn-ink: #f3cb7a;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #0f1418; --sheet: #172027; --ink: #e8edf1; --muted: #98a4ae; --rule: #26313a;
+  --film: #071219; --film-rule: #183140; --up: #f08a70; --save: #6fd8a0; --save-bg: #12321f;
+  --chip-neg: #8fe0b4; --chip-neg-bg: #143525; --chip-shop: #f3cb7a; --chip-shop-bg: #3a2c0e; --chip-law: #b8c3cd; --chip-law-bg: #24303a;
+  --warn-bg: #33270b; --warn-ink: #f3cb7a;
+  color-scheme: dark;
+}
+[hidden] { display: none !important; }
+.bench > *, #benchBody > *, .wrap > * { min-width: 0; }
+body { background: var(--paper); color: var(--ink); font-family: var(--body); font-size: 16px; line-height: 1.5; }
+.wrap { max-width: 1180px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 28px 48px; display: grid; gap: 26px; }
+.num { font-variant-numeric: tabular-nums; }
+.label { font-family: var(--mono); font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; }
+
+header { display: grid; gap: 10px; max-width: 780px; }
+.eyebrow { font-family: var(--mono); font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.sample { color: var(--warn-ink); background: var(--warn-bg); padding: 2px 8px; border-radius: 2px; letter-spacing: 0.08em; }
+h1 { margin: 0; font-family: var(--display); font-weight: 700; font-size: clamp(30px, 4.4vw, 46px); line-height: 1.05; letter-spacing: -0.01em; text-wrap: balance; }
+h1 span { color: var(--muted); font-weight: 500; }
+.lede { margin: 0; color: var(--muted); max-width: 64ch; }
+
+/* company picker */
+.picker { display: grid; gap: 10px; }
+.picker .label { color: var(--muted); }
+.cos { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 8px; }
+@media (max-width: 1000px) { .cos { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 520px) { .cos { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.co { text-align: left; font: inherit; color: var(--ink); background: var(--sheet); border: 1px solid var(--rule); border-radius: 4px; padding: 10px 12px; cursor: pointer; display: grid; gap: 2px; }
+.co:hover { border-color: var(--muted); }
+.co[aria-selected="true"] { border-color: var(--ink); box-shadow: inset 0 -3px 0 var(--scan); }
+.co b { font-weight: 600; font-size: 15px; line-height: 1.25; }
+.co span { font-family: var(--mono); font-size: 11px; color: var(--muted); }
+.co i { font-style: normal; font-family: var(--mono); font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--warn-ink); }
+
+/* steps */
+.steps { display: flex; flex-wrap: wrap; gap: 6px 18px; font-family: var(--mono); font-size: 12px; color: var(--muted); letter-spacing: 0.06em; }
+.steps b { color: var(--ink); font-weight: 600; }
+.step-h { display: flex; align-items: baseline; gap: 10px; }
+.step-n { font-family: var(--display); font-weight: 700; font-size: 26px; line-height: 1; color: var(--muted); }
+h2 { margin: 0; font-family: var(--display); font-weight: 600; font-size: 24px; line-height: 1.2; text-wrap: balance; }
+.hint { margin: 0; color: var(--muted); font-size: 15px; max-width: 70ch; }
+
+.split { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); border-radius: 6px; overflow: hidden; box-shadow: 0 1px 0 var(--rule), 0 12px 40px rgba(10, 25, 35, 0.12); }
+@media (max-width: 880px) { .split { grid-template-columns: minmax(0, 1fr); } }
+
+.sheet { background: var(--sheet); padding: 24px; display: grid; align-content: start; gap: 16px; border: 1px solid var(--rule); border-right: 0; }
+@media (max-width: 880px) { .sheet { border-right: 1px solid var(--rule); border-bottom: 0; } }
+.doc { border-top: 2px solid var(--ink); padding-top: 12px; display: grid; gap: 2px; }
+.doc .nm { font-weight: 600; }
+.doc .meta { font-family: var(--mono); font-size: 12px; color: var(--muted); }
+.big { font-family: var(--display); font-weight: 700; font-size: clamp(48px, 7vw, 76px); line-height: 1; letter-spacing: -0.02em; }
+.big small { display: block; margin-top: 6px; font-size: 15px; font-weight: 500; color: var(--muted); letter-spacing: 0; }
+.delta { font-family: var(--mono); font-size: 14px; color: var(--up); font-weight: 600; }
+.inv { display: grid; gap: 0; border-top: 1px solid var(--rule); }
+.inv div { display: flex; justify-content: space-between; gap: 12px; padding: 8px 0; border-bottom: 1px dashed var(--rule); font-size: 15px; }
+.inv div span:last-child { font-weight: 600; }
+.inv small { display: block; color: var(--muted); font-size: 12px; }
+.lines { display: grid; gap: 4px; font-size: 15px; }
+.lines div { display: flex; justify-content: space-between; gap: 12px; }
+.lines span:first-child { color: var(--muted); }
+
+.film { position: relative; background: var(--film); color: var(--film-ink); padding: 24px; display: grid; gap: 18px; align-content: start; overflow: hidden; }
+.film .label { color: var(--scan); }
+.film-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+.film-head p { margin: 0; color: var(--film-muted); font-size: 14px; }
+.film::after { content: ""; position: absolute; top: 0; bottom: 0; width: 120px; left: -140px; background: linear-gradient(90deg, transparent, rgba(95, 214, 245, 0.16), transparent); pointer-events: none; }
+.film.scan::after { animation: sweep 1.8s ease-out 1; }
+@keyframes sweep { to { left: 110%; } }
+@media (prefers-reduced-motion: reduce) { .film.scan::after { animation: none; } }
+.stack { display: flex; height: 40px; border-radius: 3px; overflow: hidden; gap: 2px; }
+.stack div { min-width: 2px; position: relative; }
+.stack div span { position: absolute; left: 8px; top: 50%; transform: translateY(-50%); font-family: var(--mono); font-size: 12px; font-weight: 600; color: #071219; white-space: nowrap; }
+.scale { display: flex; justify-content: space-between; font-family: var(--mono); font-size: 11px; color: var(--film-muted); margin-top: 6px; }
+.parts { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 14px; color: inherit; }
+.film table { min-width: 520px; }
+th { text-align: right; font-family: var(--mono); font-weight: 500; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; padding: 0 8px 8px; }
+th:first-child, td:first-child { text-align: left; padding-left: 0; }
+td { padding: 9px 8px; text-align: right; font-variant-numeric: tabular-nums; vertical-align: middle; }
+.film th { color: var(--film-muted); border-bottom: 1px solid var(--film-rule); }
+.film td { border-bottom: 1px solid var(--film-rule); }
+.name { display: flex; align-items: center; gap: 10px; font-weight: 600; }
+.swatch { width: 10px; height: 10px; border-radius: 2px; flex: none; }
+.sub { display: block; font-weight: 400; font-size: 12px; opacity: 0.75; }
+.chg { color: var(--up); font-weight: 600; }
+.chg.flat { opacity: 0.6; font-weight: 400; color: inherit; }
+.chip { display: inline-block; font-family: var(--mono); font-size: 11px; font-weight: 600; padding: 3px 7px; border-radius: 2px; white-space: nowrap; }
+.chip.neg { color: var(--chip-neg); background: var(--chip-neg-bg); }
+.chip.shop { color: var(--chip-shop); background: var(--chip-shop-bg); }
+.chip.law { color: var(--chip-law); background: var(--chip-law-bg); }
+tfoot td { font-weight: 600; border-bottom: 0 !important; }
+
+/* benchmark */
+.bench { background: var(--sheet); border: 1px solid var(--rule); border-radius: 6px; padding: 24px; display: grid; gap: 22px; }
+.bench-top { display: flex; flex-wrap: wrap; gap: 12px 20px; justify-content: space-between; align-items: start; }
+.toggle { font: 600 14px var(--body); border-radius: 3px; padding: 9px 14px; cursor: pointer; border: 1px solid var(--save); background: var(--save); color: var(--sheet); }
+.toggle[aria-expanded="true"] { background: transparent; color: var(--save); }
+.toggle:focus-visible, .co:focus-visible, input:focus-visible, button:focus-visible { outline: 2px solid var(--scan); outline-offset: 2px; }
+.flag { font-size: 13px; color: var(--warn-ink); background: var(--warn-bg); padding: 8px 12px; border-radius: 3px; }
+
+.roi { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0; border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); }
+@media (max-width: 720px) { .roi { grid-template-columns: minmax(0, 1fr); } }
+.roi > div { padding: 16px 18px 16px 0; display: grid; gap: 4px; }
+.roi > div + div { border-left: 1px solid var(--rule); padding-left: 18px; }
+@media (max-width: 720px) { .roi > div + div { border-left: 0; border-top: 1px solid var(--rule); padding-left: 0; } }
+.roi .label { color: var(--muted); }
+.roi .v { font-family: var(--display); font-weight: 700; font-size: clamp(28px, 3.6vw, 38px); line-height: 1.05; color: var(--save); }
+.roi .v.ink { color: var(--ink); }
+.roi p { margin: 0; font-size: 14px; color: var(--muted); }
+
+.cmp-wrap { overflow-x: auto; }
+.cmp { min-width: 600px; }
+.cmp th { color: var(--muted); border-bottom: 1px solid var(--rule); }
+.cmp td { border-bottom: 1px solid var(--rule); }
+.cmp .name { font-weight: 600; }
+.bar { position: relative; height: 14px; background: var(--paper); border: 1px solid var(--rule); border-radius: 2px; min-width: 160px; }
+.bar .now { position: absolute; inset: 0; background: color-mix(in srgb, var(--muted) 22%, transparent); }
+.bar .band { position: absolute; top: -3px; bottom: -3px; background: var(--save); opacity: 0.85; border-radius: 2px; }
+.save-cell { color: var(--save); font-weight: 600; white-space: nowrap; }
+.save-cell.none { color: var(--muted); font-weight: 400; }
+.legend { display: flex; flex-wrap: wrap; gap: 14px; font-size: 13px; color: var(--muted); }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.legend i { display: inline-block; width: 18px; height: 10px; border-radius: 2px; }
+
+.findings { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
+@media (max-width: 820px) { .findings { grid-template-columns: minmax(0, 1fr); } }
+.finding { display: grid; gap: 6px; align-content: start; border-top: 3px solid var(--save); padding-top: 12px; }
+.finding .label { color: var(--save); }
+.finding b { font-weight: 600; line-height: 1.35; }
+.finding span { color: var(--muted); font-size: 15px; }
+
+/* edit */
+details.edit { background: var(--sheet); border: 1px solid var(--rule); border-radius: 6px; padding: 16px 20px; }
+details.edit summary { cursor: pointer; font-weight: 600; }
+.edit-body { display: grid; gap: 14px; margin-top: 14px; }
+.row2 { display: grid; grid-template-columns: repeat(2, minmax(0, 220px)); gap: 10px; }
+label.f { display: grid; gap: 4px; font-size: 13px; color: var(--muted); }
+input[type="number"] { font: 500 15px var(--mono); color: var(--ink); background: var(--paper); border: 1px solid var(--rule); border-radius: 3px; padding: 7px 9px; width: 100%; box-sizing: border-box; font-variant-numeric: tabular-nums; }
+.grid-in { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) minmax(0, 1fr); gap: 8px 10px; align-items: center; font-size: 14px; max-width: 560px; }
+.grid-in .h { font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.btns { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+.btn { font: 600 14px var(--body); border-radius: 3px; padding: 8px 14px; cursor: pointer; border: 1px solid var(--rule); background: transparent; color: var(--ink); }
+.saved { font-size: 13px; color: var(--muted); }
+
+footer { border-top: 1px solid var(--rule); padding-top: 18px; display: grid; gap: 8px; color: var(--muted); font-size: 14px; }
+footer strong { color: var(--ink); font-weight: 600; font-size: 16px; }
+footer p { margin: 0; max-width: 84ch; }
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Renewal X-ray · Benchmark <span class="sample">Concept · illustrative figures</span></div>
+    <h1>Your Insperity renewal, x-rayed. <span>Then benchmarked against TriNet.</span></h1>
+    <p class="lede">Pick the company closest to yours. See the renewal the way it arrives, what is inside the rate, and what a company like yours could pay with TriNet.</p>
+  </header>
+
+  <section class="picker" aria-label="Example companies">
+    <span class="label">Start with a company like yours</span>
+    <div class="cos" id="cos" role="tablist"></div>
+  </section>
+
+  <div class="steps" aria-hidden="true"><span><b>1</b> The renewal</span><span><b>2</b> The x-ray</span><span><b>3</b> The TriNet benchmark</span></div>
+
+  <section class="split" aria-label="Steps 1 and 2">
+    <div class="sheet">
+      <div class="step-h"><span class="step-n">1</span><span class="label" style="color:var(--muted)">How the renewal reads</span></div>
+      <div class="doc">
+        <span class="nm" id="docName"></span>
+        <span class="meta" id="docMeta"></span>
+      </div>
+      <div>
+        <div class="big num" id="bigRate"></div>
+        <div class="delta num" id="bigDelta"></div>
+      </div>
+      <div class="inv num" id="inv"></div>
+      <div class="lines num">
+        <div><span>Annual cost</span><b id="annual"></b></div>
+        <div><span>Increase per year</span><b id="annualUp"></b></div>
+      </div>
+    </div>
+
+    <div class="film" id="film">
+      <div class="film-head">
+        <div class="step-h"><span class="step-n" style="color:var(--film-muted)">2</span><span class="label" id="filmLabel">X-ray</span></div>
+        <p>Per employee per month</p>
+      </div>
+      <div>
+        <div class="stack" id="stack" role="img" aria-label="Stacked bar of cost parts this year"></div>
+        <div class="scale num" id="scale"></div>
+      </div>
+      <div class="parts">
+        <table>
+          <thead><tr><th>Part</th><th>Last year</th><th>This year</th><th>Change</th><th>Room to move</th></tr></thead>
+          <tbody id="rows"></tbody>
+          <tfoot><tr><td>Total</td><td id="totLast"></td><td id="totThis"></td><td id="totChg" class="chg"></td><td></td></tr></tfoot>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="bench" aria-label="Step 3">
+    <div class="bench-top">
+      <div style="display:grid;gap:6px;max-width:64ch">
+        <div class="step-h"><span class="step-n">3</span><h2>The TriNet benchmark</h2></div>
+        <p class="hint" id="benchHint"></p>
+      </div>
+      <button class="toggle" id="toggle" type="button" aria-expanded="true" aria-controls="benchBody">Hide the benchmark</button>
+    </div>
+    <div id="benchBody" style="display:grid;gap:22px">
+      <p class="flag" id="flag"></p>
+      <div class="roi num">
+        <div><span class="label">Hard savings per year</span><span class="v" id="roiSave"></span><p id="roiSaveP"></p></div>
+        <div><span class="label">Admin time returned</span><span class="v ink" id="roiHrs"></span><p id="roiHrsP"></p></div>
+        <div><span class="label">Three-year value</span><span class="v" id="roi3"></span><p>Midpoint savings plus time, over three renewals.</p></div>
+      </div>
+      <div>
+        <div class="legend"><span><i style="background:color-mix(in srgb, var(--muted) 22%, transparent);border:1px solid var(--rule)"></i>Today, per employee per month</span><span><i style="background:var(--save)"></i>TriNet benchmark range</span></div>
+        <div class="cmp-wrap" style="margin-top:10px">
+          <table class="cmp">
+            <thead><tr><th>Part</th><th>Today</th><th style="text-align:left">Benchmark range</th><th>TriNet</th><th>Savings / yr</th></tr></thead>
+            <tbody id="cmpRows"></tbody>
+          </table>
+        </div>
+      </div>
+      <div>
+        <span class="label" style="color:var(--muted)">Findings</span>
+        <div class="findings" id="findings" style="margin-top:10px"></div>
+      </div>
+    </div>
+  </section>
+
+  <details class="edit" id="edit">
+    <summary>Use your own numbers</summary>
+    <div class="edit-body">
+      <p class="hint">Enter the per-employee monthly amounts from your renewal. Steps 1, 2 and 3 update. The benchmark ranges stay those of the company you picked.</p>
+      <div class="row2">
+        <label class="f" for="in-emp">Employees<input type="number" id="in-emp" min="1" step="1"></label>
+        <label class="f" for="in-wage">Average annual wage ($)<input type="number" id="in-wage" min="0" step="1000"></label>
+      </div>
+      <div class="grid-in" id="grid"><span class="h">Per employee / month</span><span class="h">Last year</span><span class="h">This year</span></div>
+      <div class="btns"><button class="btn" type="button" id="reset">Reset this company</button><span class="saved" id="saved"></span></div>
+    </div>
+  </details>
+
+  <footer>
+    <strong>Want this with your real renewal?</strong>
+    <p>Send over your renewal summary and we will build your own x-ray and TriNet benchmark before your deadline to sign.</p>
+    <p>All companies, amounts, savings ranges and findings on this page are illustrative and for concept review only. They are not actual Insperity or TriNet pricing, quotes or client results. Real renewals vary by state, industry, plan design and claims history. Insperity and TriNet are named only to describe the renewal and the benchmark.</p>
+  </footer>
+</div>
+
+<script>
+(() => {
+'use strict';
+// Parts are the same for every company. Savings are fractions of today's cost: [low, high].
+const PARTS = [
+  { id: 'health', name: 'Health premiums', sub: 'Employer share, medical, dental, vision', room: 'shop' },
+  { id: 'admin', name: 'Admin / service fee', sub: 'The PEO’s own fee', room: 'neg' },
+  { id: 'tax', name: 'Employer payroll taxes', sub: 'FICA, FUTA, state unemployment', room: 'law' },
+  { id: 'wc', name: 'Workers’ comp', sub: 'Priced by job class code', room: 'shop' },
+  { id: 'addon', name: 'Add-on services', sub: 'Time tracking, recruiting, extras', room: 'neg' },
+];
+const ROOM = { neg: ['neg', 'Negotiable'], shop: ['shop', 'Shop the market'], law: ['law', 'Mostly set by law'] };
+const COLORS = ['--c1', '--c2', '--c3', '--c4', '--c5'];
+const HOUR_RATE = 50;
+
+// tax = wage x 7.65% / 12 + FUTA + state unemployment, rounded
+const COMPANIES = [
+  { id: 'healthtech', name: 'Healthcare tech', emp: 35, wage: 118000, pending: true,
+    parts: { health: [860, 955], admin: [190, 205], tax: [781, 784], wc: [9, 10], addon: [24, 30] },
+    save: { health: [0.08, 0.14], admin: [0.10, 0.20], tax: [0, 0.01], wc: [0, 0.05], addon: [0.4, 0.8] }, hrs: 16,
+    vertical: 'Benchmarked against TriNet’s plans for technology and life sciences companies.',
+    findings: [
+      ['Benefits', 'Health premiums drove most of the increase.', 'Engineers compare benefits closely. A richer plan menu at a similar cost is the retention play.'],
+      ['Fees', 'The admin fee grew faster than headcount.', 'The fee rose 7.9% with no change in services used.'],
+      ['Workflow', 'Add-on tools overlap with what the team already uses.', 'Two paid add-ons duplicated existing software.'],
+    ] },
+  { id: 'realestate', name: 'Real estate', emp: 20, wage: 72000, pending: true,
+    parts: { health: [690, 770], admin: [175, 189], tax: [493, 495], wc: [14, 15], addon: [20, 26] },
+    save: { health: [0.06, 0.12], admin: [0.12, 0.22], tax: [0, 0.01], wc: [0, 0.08], addon: [0.3, 0.7] }, hrs: 10,
+    vertical: 'Benchmarked against TriNet’s plans for small professional and financial services firms.',
+    findings: [
+      ['Benefits', 'A small group pays a small-group premium.', 'Twenty people renew as a tiny risk pool. A larger pool can steady the increases.'],
+      ['Fees', 'A per-employee fee weighs more on a small team.', 'At 20 people, each point off the admin fee is felt directly.'],
+      ['People', 'Agents and staff have different needs.', 'Benefits for W-2 staff and a plan for 1099 agents are separate conversations.'],
+    ] },
+  { id: 'cpa', name: 'Professional services', emp: 48, wage: 85000, pending: false,
+    parts: { health: [760, 828], admin: [160, 172], tax: [574, 576], wc: [8, 8], addon: [15, 19] },
+    save: { health: [0.05, 0.10], admin: [0.10, 0.18], tax: [0, 0.01], wc: [0, 0.03], addon: [0.3, 0.6] }, hrs: 18,
+    vertical: 'Benchmarked against TriNet’s plans for professional services firms.',
+    findings: [
+      ['Timing', 'Renewal lands in tax season.', 'Open enrollment and payroll changes compete with the busiest months of the year.'],
+      ['Fees', 'Admin fee is negotiable at this headcount.', 'At nearly 50 employees there is room to ask for a lower rate.'],
+      ['Benefits', 'Plan design matters more than carrier.', 'Moving a share of staff to a better-fit plan tier saves more than switching carriers alone.'],
+    ] },
+  { id: 'mfg', name: 'Light manufacturing', emp: 85, wage: 54000, pending: false,
+    parts: { health: [640, 702], admin: [140, 150], tax: [380, 382], wc: [145, 168], addon: [10, 12] },
+    save: { health: [0.05, 0.10], admin: [0.08, 0.15], tax: [0, 0.01], wc: [0.08, 0.18], addon: [0.2, 0.5] }, hrs: 24,
+    vertical: 'Benchmarked against TriNet’s plans for Main Street and industrial employers.',
+    findings: [
+      ['Workers’ comp', 'Workers’ comp rose 15.9%, the fastest of any part.', 'Class codes and the experience mod are worth a line-by-line review.'],
+      ['Safety', 'A safety program can lower the next renewal.', 'Fewer claims improve the experience mod over time.'],
+      ['Benefits', 'Hourly staff need simple, affordable plans.', 'A lower-cost plan option can lift enrollment without raising the total.'],
+    ] },
+  { id: 'dental', name: 'Multi-site dental', emp: 60, wage: 58000, pending: false,
+    parts: { health: [610, 671], admin: [150, 162], tax: [403, 405], wc: [30, 33], addon: [18, 22] },
+    save: { health: [0.06, 0.11], admin: [0.10, 0.18], tax: [0, 0.01], wc: [0.02, 0.08], addon: [0.3, 0.6] }, hrs: 20,
+    vertical: 'Benchmarked against TriNet’s plans for healthcare practices.',
+    findings: [
+      ['Locations', 'Four sites, one set of rules.', 'Multi-site scheduling and time tracking are where admin hours go.'],
+      ['Fees', 'Add-on services rose 22%.', 'Check which add-ons each location actually uses.'],
+      ['Retention', 'Hygienists and assistants are hard to replace.', 'Benefits that compete with hospital systems help keep them.'],
+    ] },
+  { id: 'nonprofit', name: 'Nonprofit', emp: 30, wage: 62000, pending: false,
+    parts: { health: [700, 770], admin: [155, 168], tax: [423, 425], wc: [12, 13], addon: [12, 16] },
+    save: { health: [0.06, 0.12], admin: [0.10, 0.20], tax: [0, 0.02], wc: [0, 0.05], addon: [0.3, 0.7] }, hrs: 12,
+    vertical: 'Benchmarked against TriNet’s plans for nonprofits.',
+    findings: [
+      ['Taxes', '501(c)(3) organizations are exempt from FUTA.', 'Confirm the exemption is reflected in what you are billed.'],
+      ['Budget', 'Every dollar saved goes back to the mission.', 'A 10% cut in health costs funds most of a program role.'],
+      ['Reporting', 'Grant reporting needs clean payroll data.', 'Cost allocation by program saves hours at year end.'],
+    ] },
+];
+
+const $ = id => document.getElementById(id);
+const usd = n => (n < 0 ? '−' : '') + '$' + Math.round(Math.abs(n)).toLocaleString('en-US');
+const signed = n => (n > 0 ? '+' : '') + usd(n);
+const pct = n => (n > 0 ? '+' : '') + n.toFixed(1) + '%';
+const KEY = 'renewal-benchmark-v1';
+const clone = o => JSON.parse(JSON.stringify(o));
+
+let edits = {};
+try { edits = JSON.parse(localStorage.getItem(KEY)) || {}; } catch (e) {}
+let cur = COMPANIES[0].id, open = true;
+const company = () => COMPANIES.find(c => c.id === cur);
+// working copy: the company's figures, with any of this viewer's edits on top
+const data = () => { const c = company(); return edits[c.id] || { emp: c.emp, wage: c.wage, parts: clone(c.parts) }; };
+
+// picker
+$('cos').innerHTML = COMPANIES.map(c => `<button class="co" role="tab" type="button" id="co-${c.id}" data-id="${c.id}" aria-selected="false">
+  <b>${c.name}</b><span>${c.emp} employees</span>${c.pending ? '<i>Client result coming</i>' : ''}</button>`).join('');
+$('cos').addEventListener('click', e => { const b = e.target.closest('.co'); if (!b) return; cur = b.dataset.id; fillInputs(); render(true); });
+
+// inputs
+$('grid').insertAdjacentHTML('beforeend', PARTS.map(p => `<span>${p.name}</span>
+  <input type="number" id="in-${p.id}-0" min="0" step="1" aria-label="${p.name}, last year">
+  <input type="number" id="in-${p.id}-1" min="0" step="1" aria-label="${p.name}, this year">`).join(''));
+function fillInputs() {
+  const d = data(); $('in-emp').value = d.emp; $('in-wage').value = d.wage;
+  PARTS.forEach(p => { $(`in-${p.id}-0`).value = d.parts[p.id][0]; $(`in-${p.id}-1`).value = d.parts[p.id][1]; });
+}
+$('edit').addEventListener('input', e => {
+  const t = e.target; if (t.tagName !== 'INPUT') return;
+  const d = clone(data()), v = Math.max(0, parseFloat(t.value) || 0);
+  if (t.id === 'in-emp') d.emp = Math.max(1, Math.round(v));
+  else if (t.id === 'in-wage') d.wage = v;
+  else { const [, id, k] = t.id.split('-'); d.parts[id][+k] = v; }
+  edits[cur] = d;
+  try { localStorage.setItem(KEY, JSON.stringify(edits)); } catch (err) {}
+  render(false);
+});
+$('reset').onclick = () => { delete edits[cur]; try { localStorage.setItem(KEY, JSON.stringify(edits)); } catch (e) {} fillInputs(); render(false); };
+$('toggle').onclick = () => {
+  open = !open; $('benchBody').hidden = !open;
+  $('toggle').setAttribute('aria-expanded', open); $('toggle').textContent = open ? 'Hide the benchmark' : 'Compare with a TriNet benchmark';
+};
+
+function render(scan) {
+  const c = company(), d = data();
+  document.querySelectorAll('.co').forEach(b => b.setAttribute('aria-selected', b.dataset.id === cur));
+  const P = PARTS.map((p, i) => ({ ...p, last: d.parts[p.id][0], now: d.parts[p.id][1], s: c.save[p.id], color: `var(${COLORS[i]})` }));
+  const last = P.reduce((s, p) => s + p.last, 0), now = P.reduce((s, p) => s + p.now, 0), up = now - last;
+  const yr = n => n * d.emp * 12;
+  const by = id => P.find(p => p.id === id);
+
+  // 1. the bundled renewal: benefits on one line, everything else folded into the service fee
+  $('docName').textContent = `Example ${c.name.toLowerCase()} company · annual renewal`;
+  $('docMeta').textContent = `${d.emp} employees · average wage ${usd(d.wage)}`;
+  $('bigRate').innerHTML = `${usd(now)}<small>per employee per month, all in</small>`;
+  $('bigDelta').textContent = `${up >= 0 ? '▲' : '▼'} ${Math.abs(last ? up / last * 100 : 0).toFixed(1)}% from ${usd(last)}`;
+  const fee = by('admin').now + by('wc').now + by('tax').now;
+  $('inv').innerHTML = `
+    <div><span>Benefits<small>By plan election</small></span><span>${usd(by('health').now)}</span></div>
+    <div><span>Service fee<small>Admin, workers’ comp and employer taxes, bundled</small></span><span>${usd(fee)}</span></div>
+    <div><span>Add-on services</span><span>${usd(by('addon').now)}</span></div>`;
+  $('annual').textContent = usd(yr(now));
+  $('annualUp').textContent = signed(yr(up));
+
+  // 2. the x-ray
+  $('filmLabel').textContent = `X-ray · the same ${usd(now)}`;
+  $('stack').innerHTML = P.map(p => `<div style="flex:${p.now} 0 0;background:${p.color}" title="${p.name}: ${usd(p.now)}">${now && p.now / now > 0.14 ? `<span>${usd(p.now)}</span>` : ''}</div>`).join('');
+  $('scale').innerHTML = `<span>$0</span><span>${usd(now / 2)}</span><span>${usd(now)}</span>`;
+  $('rows').innerHTML = P.map(p => {
+    const dl = p.now - p.last, dp = p.last ? dl / p.last * 100 : 0, [cls, txt] = ROOM[p.room];
+    return `<tr><td><span class="name"><span class="swatch" style="background:${p.color}"></span><span>${p.name}<span class="sub">${p.sub}</span></span></span></td>
+      <td>${usd(p.last)}</td><td>${usd(p.now)}</td><td class="chg${Math.abs(dp) < 1 ? ' flat' : ''}">${signed(dl)}<span class="sub">${pct(dp)}</span></td>
+      <td><span class="chip ${cls}">${txt}</span></td></tr>`;
+  }).join('');
+  $('totLast').textContent = usd(last); $('totThis').textContent = usd(now);
+  $('totChg').textContent = `${signed(up)} (${pct(last ? up / last * 100 : 0)})`;
+  if (scan) { const f = $('film'); f.classList.remove('scan'); void f.offsetWidth; f.classList.add('scan'); }
+
+  // 3. the benchmark
+  $('benchHint').textContent = `${c.vertical} Each part is compared on its own, so you can see where any savings would come from.`;
+  $('flag').textContent = c.pending
+    ? 'Placeholder figures. This example will be replaced with an anonymized TriNet client result.'
+    : 'Illustrative figures for concept review. Not a TriNet quote.';
+  const lo = P.reduce((s, p) => s + p.now * p.s[0], 0), hi = P.reduce((s, p) => s + p.now * p.s[1], 0);
+  $('roiSave').textContent = `${usd(yr(lo))} to ${usd(yr(hi))}`;
+  $('roiSaveP').textContent = `${(lo / now * 100).toFixed(1)}% to ${(hi / now * 100).toFixed(1)}% of today’s total cost, or ${usd(lo)} to ${usd(hi)} per employee per month.`;
+  const hrs = c.hrs * 12;
+  $('roiHrs').textContent = `${hrs} hours`;
+  $('roiHrsP').textContent = `About ${c.hrs} hours a month, worth ${usd(hrs * HOUR_RATE)} a year at $${HOUR_RATE} an hour.`;
+  $('roi3').textContent = usd(3 * (yr((lo + hi) / 2) + hrs * HOUR_RATE));
+  $('cmpRows').innerHTML = P.map(p => {
+    const a = p.now * (1 - p.s[1]), b = p.now * (1 - p.s[0]);
+    const sv = [yr(p.now - b), yr(p.now - a)];
+    const none = p.s[1] < 0.005;
+    return `<tr><td><span class="name"><span class="swatch" style="background:${p.color}"></span>${p.name}</span></td>
+      <td>${usd(p.now)}</td>
+      <td><div class="bar" aria-hidden="true"><div class="now"></div><div class="band" style="left:${(1 - p.s[1]) * 100}%;width:${Math.max(1.2, (p.s[1] - p.s[0]) * 100)}%"></div></div></td>
+      <td>${usd(a)}–${usd(b)}</td>
+      <td class="save-cell${none ? ' none' : ''}">${none ? 'Set by law' : `${usd(sv[0])}–${usd(sv[1])}`}</td></tr>`;
+  }).join('');
+  $('findings').innerHTML = c.findings.map(([k, h, t]) => `<div class="finding"><span class="label">${k}</span><b>${h}</b><span>${t}</span></div>`).join('');
+
+  $('saved').textContent = edits[cur] ? 'Showing your numbers, saved in this browser only' : 'Showing the example figures';
+}
+fillInputs(); render(false);
+})();
+</script>
