@@ -1,0 +1,518 @@
+<title>Rabbit From a Hat</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@1,6..96,500;1,6..96,700&family=Figtree:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: a theatre bill. Header strip, two stage windows that share one clock, a brass control rail. */
+:root {
+  --ink: #0d0a0c;          /* house lights down */
+  --velvet: #3b0e15;       /* curtain */
+  --velvet-hi: #5a1820;
+  --brass: #c9a24a;        /* fittings, timeline */
+  --chalk: #efe8dc;        /* text, gloves */
+  --muted: #a3968a;
+  --xray: #72e0ff;         /* the secret */
+  --xray-bg: #07131b;
+  --line: #2a1f22;
+  --display: "Bodoni Moda", "Didot", "Bodoni 72", Georgia, serif;
+  --body: "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  color-scheme: dark;
+}
+html, body { height: 100%; }
+body {
+  background: var(--ink);
+  color: var(--chalk);
+  font-family: var(--body);
+  font-size: 14px;
+  overflow: hidden;
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+}
+.wrap { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+
+header { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 20px; padding-block: 14px 10px; border-bottom: 1px solid var(--line); }
+h1 { margin: 0; font-family: var(--display); font-style: italic; font-weight: 700; font-size: clamp(22px, 3vw, 30px); letter-spacing: 0.01em; color: var(--chalk); text-wrap: balance; }
+h1 em { color: var(--brass); font-style: italic; }
+.phase { font-family: var(--mono); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--brass); }
+.phase b { color: var(--chalk); font-weight: 600; }
+.badge { font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; padding: 3px 8px; border: 1px solid var(--xray); color: var(--xray); border-radius: 2px; }
+
+.stage { position: relative; min-height: 0; }
+.stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.panes { position: absolute; inset: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 2px; pointer-events: none; }
+.pane { position: relative; min-width: 0; min-height: 0; overflow: hidden; }
+.pane[hidden] { display: none !important; }
+body.solo .panes { grid-template-columns: 1fr; }
+@media (max-width: 760px), (max-aspect-ratio: 1/1) {
+  .cap { font-size: 13px; padding: 6px 10px; }
+  .panes { grid-template-columns: 1fr; grid-template-rows: 1fr 1fr; }
+  body.solo .panes { grid-template-rows: 1fr; }
+}
+.tag { position: absolute; top: 12px; left: 12px; font-family: var(--mono); font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; padding: 4px 8px; background: rgba(13, 10, 12, 0.7); border: 1px solid var(--brass); color: var(--brass); }
+#paneX .tag { border-color: var(--xray); color: var(--xray); background: rgba(7, 19, 27, 0.75); }
+.cap { position: absolute; left: 12px; right: 12px; bottom: 12px; max-width: 46ch; font-size: 15px; line-height: 1.4; padding: 8px 12px; background: rgba(13, 10, 12, 0.72); border-left: 2px solid var(--brass); }
+#paneX .cap { border-left-color: var(--xray); background: rgba(7, 19, 27, 0.78); }
+.clock { position: absolute; top: 12px; right: 12px; font-family: var(--mono); font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; background: rgba(13, 10, 12, 0.6); padding: 4px 8px; }
+
+.xlabel { position: absolute; transform: translate(10px, -50%); font-family: var(--mono); font-size: 11px; color: var(--xray); white-space: nowrap; pointer-events: none; text-shadow: 0 0 6px var(--xray-bg), 0 0 2px var(--xray-bg); }
+.xlabel::before { content: ""; position: absolute; left: -12px; top: 50%; width: 6px; height: 6px; margin-top: -3px; border-radius: 50%; background: var(--xray); box-shadow: 0 0 8px var(--xray); }
+
+.rail { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; padding-block: 12px max(12px, env(safe-area-inset-bottom, 0px)); border-top: 1px solid var(--line); background: #120d0f; }
+button { font: 500 13px var(--body); color: var(--chalk); background: transparent; border: 1px solid #4a3a30; padding: 7px 12px; border-radius: 3px; cursor: pointer; }
+button:hover { border-color: var(--brass); }
+button:focus-visible, input:focus-visible { outline: 2px solid var(--brass); outline-offset: 2px; }
+button.primary { background: var(--brass); color: var(--ink); border-color: var(--brass); font-weight: 600; min-width: 74px; }
+button.secret { border-color: var(--xray); color: var(--xray); }
+button.secret:hover { background: rgba(114, 224, 255, 0.08); }
+.seg { display: inline-flex; border: 1px solid #4a3a30; border-radius: 3px; overflow: hidden; }
+.seg button { border: 0; border-radius: 0; padding: 7px 10px; }
+.seg button[aria-pressed="true"] { background: var(--velvet-hi); color: var(--chalk); }
+.time { font-family: var(--mono); font-size: 13px; font-variant-numeric: tabular-nums; color: var(--chalk); min-width: 9ch; }
+.scrub { position: relative; flex: 1 1 260px; min-width: 0; height: 30px; display: flex; align-items: center; }
+.scrub input { width: 100%; margin: 0; accent-color: var(--brass); position: relative; z-index: 1; }
+.ticks { position: absolute; inset: 0; pointer-events: none; }
+.ticks i { position: absolute; top: 2px; width: 1px; height: 7px; background: var(--brass); opacity: 0.7; }
+.ticks i.s { background: var(--xray); opacity: 1; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<header class="wrap">
+  <h1>Rabbit <em>from</em> a Hat</h1>
+  <span class="phase">Now: <b id="phaseName">The empty hat</b></span>
+  <span class="badge" id="replayBadge" hidden>REPLAY · ¼ SPEED</span>
+</header>
+
+<main class="stage" id="stage">
+  <canvas id="c" aria-label="Two synchronized views of the rabbit-from-a-hat trick"></canvas>
+  <div class="panes">
+    <section class="pane" id="paneA">
+      <span class="tag">What the audience sees</span>
+      <span class="clock" id="clockA">t = 0.00 s</span>
+      <p class="cap" id="capA"></p>
+    </section>
+    <section class="pane" id="paneX">
+      <span class="tag">X-ray · same second</span>
+      <span class="clock" id="clockX">t = 0.00 s</span>
+      <div id="labels"></div>
+      <p class="cap" id="capX"></p>
+    </section>
+  </div>
+</main>
+
+<footer class="rail wrap">
+  <button class="primary" id="play" type="button">Pause</button>
+  <span class="time" id="time">0.00 / 14 s</span>
+  <div class="scrub">
+    <div class="ticks" id="ticks"></div>
+    <input id="scrub" type="range" min="0" max="14" step="0.01" value="0" aria-label="Trick timeline in seconds">
+  </div>
+  <button class="secret" id="replay" type="button">Replay the secret at ¼ speed</button>
+  <div class="seg" role="group" aria-label="Playback speed">
+    <button type="button" id="sp1" aria-pressed="true">1×</button>
+    <button type="button" id="sp4" aria-pressed="false">¼×</button>
+  </div>
+  <div class="seg" role="group" aria-label="View">
+    <button type="button" data-view="split" aria-pressed="true">Split</button>
+    <button type="button" data-view="audience" aria-pressed="false">Audience</button>
+    <button type="button" data-view="xray" aria-pressed="false">X-ray</button>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.149.0/build/three.min.js"></script>
+<script>
+(() => {
+'use strict';
+const T = 14;                 // length of one performance, seconds
+const TOP = 0.925;            // tabletop surface height, metres
+const HAT_H = 0.265;          // brim to (missing) crown top
+const PLAT_REST = 0.33, PLAT_UP = TOP + 0.01;
+
+// ---------- keyframes ----------
+const ease = {
+  io: x => x * x * (3 - 2 * x),
+  back: x => { const c = 1.9; x -= 1; return 1 + (c + 1) * x * x * x + c * x * x; },
+  lin: x => x,
+};
+// keys: [[t, value, easeName?], ...]; value is a number or an array
+function at(keys, t) {
+  if (t <= keys[0][0]) return keys[0][1];
+  for (let i = 1; i < keys.length; i++) {
+    const [t1, v1, e] = keys[i];
+    if (t <= t1) {
+      const [t0, v0] = keys[i - 1];
+      const f = (ease[e] || ease.io)((t - t0) / (t1 - t0 || 1));
+      return Array.isArray(v0) ? v0.map((a, j) => a + (v1[j] - a) * f) : v0 + (v1 - v0) * f;
+    }
+  }
+  return keys[keys.length - 1][1];
+}
+
+const HAT_SIDE = [-0.36, TOP, 0.05], HAT_AIR = [-0.2, 1.5, 0.05], HAT_SET = [0, TOP + HAT_H, 0];
+const R_REST = [0.55, 1.2, 0.25], L_REST = [-0.55, 1.2, 0.25];
+const TAP = [0.27, 1.37, 0.15], WAND_DOWN = [0.42, 0.955, 0.2], ABOVE = [0.2, 1.45, 0.1];
+
+const K = {
+  hatPos: [[0, HAT_SIDE], [1.4, HAT_SIDE], [2.2, HAT_AIR], [3.0, HAT_SET], [12.0, HAT_SET], [12.7, HAT_AIR], [13.4, HAT_SIDE]],
+  hatRot: [[0, 0], [1.4, 0], [3.0, Math.PI], [12.0, Math.PI], [13.4, 0]],
+  holdL: [[0, 0], [1.0, 0], [1.4, 1], [13.4, 1], [13.8, 0]],
+  trap: [[0, 0], [4.4, 0], [4.9, 1.62], [11.6, 1.62], [12.0, 0]],
+  plat: [[0, PLAT_REST], [4.9, PLAT_REST], [6.0, PLAT_UP, 'back'], [10.8, PLAT_UP], [11.6, PLAT_REST]],
+  lift: [[7.0, PLAT_UP], [8.0, 1.40], [9.6, 1.40], [10.4, PLAT_UP]],
+  rFree: [[0, R_REST], [3.0, R_REST], [3.4, TAP], [4.8, TAP], [5.6, WAND_DOWN], [6.2, WAND_DOWN], [6.6, ABOVE], [10.7, ABOVE], [11.2, R_REST], [12.2, WAND_DOWN], [12.6, WAND_DOWN], [13.2, R_REST]],
+  rRot: [[0, 0.4], [3.0, 0.4], [3.4, 0.9], [4.8, 0.9], [5.6, 1.4], [6.2, 1.4], [6.8, Math.PI], [10.6, Math.PI], [11.2, 0.4], [12.2, 1.4], [12.6, 1.4], [13.2, 0.4]],
+  grip: [[0, 0], [6.4, 0], [7.0, 1], [10.4, 1], [10.7, 0]],
+  aim: [[0, 0], [3.0, 0], [3.4, 1], [4.8, 1], [5.5, 0]],
+  lay: [[0, 0], [4.8, 0], [5.7, 1], [12.6, 1], [13.2, 0]],
+};
+
+const PHASES = [
+  [0.0, 'The empty hat', 'An ordinary top hat sits on the table.', 'The hat has no top. It is a felt tube.'],
+  [1.0, 'Over the trap', 'The magician turns the hat over and sets it down.', 'It lands exactly over a square trap cut into the tabletop.'],
+  [3.4, 'Three taps', 'Three taps of the wand.', 'Misdirection. Every eye goes to the wand tip.', 0],
+  [4.4, 'The trap opens', 'Nothing happens. Yet.', 'The trap door drops away inside the hat.', 1],
+  [4.9, 'The spring', 'Still nothing to see.', 'A spring platform pushes the rabbit 60 cm up through the tube.', 1],
+  [6.4, 'The reach', 'A gloved hand reaches into the hat.', 'The rabbit has been sitting in there for a full second.'],
+  [7.0, 'The reveal', 'A rabbit!', 'Lifted by the ears straight off the platform.'],
+  [9.6, 'Back in', 'The rabbit goes back into the hat.', 'Lowered onto the waiting platform.'],
+  [10.8, 'Gone', 'The hat is empty again.', 'The spring retracts and the trap swings shut.', 1],
+  [12.0, 'Reset', 'The hat goes back on the table.', 'Ready for the next show.'],
+];
+const phaseAt = t => { let p = PHASES[0]; for (const q of PHASES) if (t >= q[0]) p = q; return p; };
+
+// ---------- renderer & scene ----------
+const canvas = document.getElementById('c');
+const stageEl = document.getElementById('stage');
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.outputEncoding = THREE.sRGBEncoding;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 0.9;
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.autoClear = false;
+
+const scene = new THREE.Scene();
+const BG_SHOW = new THREE.Color(0x0d0a0c), BG_XRAY = new THREE.Color(0x07131b);
+const V = (a) => new THREE.Vector3(a[0], a[1], a[2]);
+
+const swaps = [];  // {mesh, show, xray}
+const ghost = (color, op) => new THREE.MeshBasicMaterial({ color, transparent: true, opacity: op, depthWrite: false, side: THREE.DoubleSide });
+const edgeMat = (color, op) => new THREE.LineBasicMaterial({ color, transparent: true, opacity: op });
+const GHOST = ghost(0x72e0ff, 0.05), GHOST_EDGE = edgeMat(0x72e0ff, 0.5);
+const HAT_GHOST = ghost(0xefe8dc, 0.1), HAT_EDGE = edgeMat(0xefe8dc, 0.9);
+
+// mesh becomes see-through in the x-ray pass, outlined by its edges
+function xray(mesh, mat = GHOST, edge = GHOST_EDGE, angle = 30) {
+  swaps.push({ mesh, show: mesh.material, xray: mat });
+  const lines = new THREE.LineSegments(new THREE.EdgesGeometry(mesh.geometry, angle), edge);
+  lines.userData.only = 'xray';
+  mesh.add(lines);
+  return mesh;
+}
+function only(obj, mode) { obj.userData.only = mode; return obj; }
+function mesh(geo, mat, x = 0, y = 0, z = 0, parent = scene) {
+  const m = new THREE.Mesh(geo, mat); m.position.set(x, y, z); parent.add(m); return m;
+}
+
+// lights
+scene.add(new THREE.HemisphereLight(0xffe9d0, 0x1a0b0e, 0.28));
+const spot = new THREE.SpotLight(0xfff1dc, 1.7, 9, 0.42, 0.6, 1.2);
+spot.position.set(0.9, 3.4, 2.4); spot.target.position.set(0, 1.0, 0);
+spot.castShadow = true; spot.shadow.mapSize.set(1024, 1024); spot.shadow.bias = -0.0004;
+scene.add(spot, spot.target);
+const rim = new THREE.PointLight(0xc9a24a, 0.8, 5); rim.position.set(-1.2, 1.8, -1.0); scene.add(rim);
+
+// materials
+const M = {
+  floor: new THREE.MeshStandardMaterial({ color: 0x1c1311, roughness: 0.85 }),
+  curtain: new THREE.MeshStandardMaterial({ color: 0x320a10, roughness: 0.95 }),
+  velvet: new THREE.MeshStandardMaterial({ color: 0x3e0c14, roughness: 0.92 }),
+  wood: new THREE.MeshStandardMaterial({ color: 0x2b1a14, roughness: 0.55 }),
+  brass: new THREE.MeshStandardMaterial({ color: 0xc9a24a, roughness: 0.35, metalness: 0.8 }),
+  felt: new THREE.MeshStandardMaterial({ color: 0x15121a, roughness: 0.8, side: THREE.DoubleSide }),
+  satin: new THREE.MeshStandardMaterial({ color: 0x6b1420, roughness: 0.4, side: THREE.DoubleSide }),
+  black: new THREE.MeshStandardMaterial({ color: 0x080607, roughness: 1, side: THREE.DoubleSide }),
+  steel: new THREE.MeshStandardMaterial({ color: 0xff9a3c, roughness: 0.35, metalness: 0.6, emissive: 0x3a1600 }),
+  plate: new THREE.MeshStandardMaterial({ color: 0x9aa4ad, roughness: 0.4, metalness: 0.7 }),
+  fur: new THREE.MeshStandardMaterial({ color: 0xf4f1ec, roughness: 0.95 }),
+  pink: new THREE.MeshStandardMaterial({ color: 0xe8a3a8, roughness: 0.7 }),
+  eye: new THREE.MeshStandardMaterial({ color: 0x110808, roughness: 0.2 }),
+  glove: new THREE.MeshStandardMaterial({ color: 0xf7f4ee, roughness: 0.75 }),
+  wand: new THREE.MeshStandardMaterial({ color: 0x0b0a0c, roughness: 0.3 }),
+  tip: new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.4 }),
+  flapX: new THREE.MeshStandardMaterial({ color: 0xffd25a, roughness: 0.5, emissive: 0x3a2a00 }),
+  boxX: ghost(0x72e0ff, 0.12),
+};
+
+// ---------- stage ----------
+const floor = mesh(new THREE.PlaneGeometry(14, 14), M.floor); floor.rotation.x = -Math.PI / 2; floor.receiveShadow = true; only(floor, 'show');
+function folds(w, h, amp, freq) {
+  const g = new THREE.PlaneGeometry(w, h, Math.round(w * 60), 1), p = g.attributes.position;
+  for (let i = 0; i < p.count; i++) p.setZ(i, Math.sin(p.getX(i) * freq) * amp);
+  g.computeVertexNormals(); return g;
+}
+only(mesh(folds(9, 4.5, 0.05, 9), M.curtain, 0, 2.25, -1.8), 'show');
+const grid = only(new THREE.GridHelper(6, 30, 0x1d4a5c, 0x0f2a36), 'xray'); scene.add(grid);
+
+// table: top built around a 15 cm square trap
+const table = new THREE.Group(); scene.add(table);
+const TH = 0.025, TY = TOP - TH / 2, HOLE = 0.075;
+[[0, 0.1875, 1.0, 0.225], [0, -0.1875, 1.0, 0.225], [-0.2875, 0, 0.425, 0.15], [0.2875, 0, 0.425, 0.15]].forEach(([x, z, w, d]) => {
+  const m = xray(mesh(new THREE.BoxGeometry(w, TH, d), M.wood, x, TY, z, table)); m.receiveShadow = true; m.castShadow = true;
+});
+[[-0.45, -0.26], [0.45, -0.26], [-0.45, 0.26], [0.45, 0.26]].forEach(([x, z]) => xray(mesh(new THREE.CylinderGeometry(0.018, 0.014, TOP - TH, 12), M.wood, x, (TOP - TH) / 2, z, table)));
+// the skirt: velvet on three sides, open at the back where the magician stands
+const front = xray(mesh(folds(1.04, TOP - 0.01, 0.006, 42), M.velvet, 0, (TOP - 0.01) / 2, 0.306, table));
+const sideG = folds(0.62, TOP - 0.01, 0.006, 42);
+const sideL = xray(mesh(sideG, M.velvet, -0.52, (TOP - 0.01) / 2, 0, table)); sideL.rotation.y = -Math.PI / 2;
+const sideR = xray(mesh(sideG, M.velvet, 0.52, (TOP - 0.01) / 2, 0, table)); sideR.rotation.y = Math.PI / 2;
+[front, sideL, sideR].forEach(m => m.receiveShadow = true);
+xray(mesh(new THREE.BoxGeometry(1.05, 0.03, 0.012), M.brass, 0, TOP - 0.03, 0.31, table));
+// hidden compartment under the trap
+const box = new THREE.Group(); table.add(box);
+const BW = 0.24, BY0 = 0.19, BY1 = TOP - TH;
+[[0, (BY0 + BY1) / 2, -BW / 2, 0], [0, (BY0 + BY1) / 2, BW / 2, 0], [-BW / 2, (BY0 + BY1) / 2, 0, 1], [BW / 2, (BY0 + BY1) / 2, 0, 1]].forEach(([x, y, z, r]) => {
+  const m = mesh(new THREE.PlaneGeometry(BW, BY1 - BY0), M.black, x, y, z, box); m.rotation.y = r * Math.PI / 2;
+  swaps.push({ mesh: m, show: M.black, xray: M.boxX });
+});
+const basePlate = mesh(new THREE.BoxGeometry(BW, 0.012, BW), M.plate, 0, BY0 + 0.004, 0, box);
+// trap flap, hinged on its back edge
+const hinge = new THREE.Group(); hinge.position.set(0, TY, -HOLE); table.add(hinge);
+const flap = mesh(new THREE.BoxGeometry(HOLE * 2 - 0.002, TH, HOLE * 2 - 0.002), M.wood, 0, 0, HOLE, hinge);
+swaps.push({ mesh: flap, show: M.wood, xray: M.flapX });
+// spring lift
+class Helix extends THREE.Curve {
+  getPoint(u, out = new THREE.Vector3()) { const a = u * Math.PI * 2 * 9; return out.set(Math.cos(a) * 0.045, u, Math.sin(a) * 0.045); }
+}
+const spring = mesh(new THREE.TubeGeometry(new Helix(), 500, 0.0055, 6, false), M.steel, 0, BY0 + 0.01, 0);
+const platform = mesh(new THREE.BoxGeometry(0.13, 0.016, 0.13), M.plate);
+platform.castShadow = true;
+
+// ---------- the hat (a tube: brim, crown, band, no top) ----------
+const hat = new THREE.Group(); scene.add(hat);
+const crown = xray(mesh(new THREE.CylinderGeometry(0.108, 0.112, HAT_H - 0.005, 48, 1, true), M.felt, 0, 0.005 + (HAT_H - 0.005) / 2, 0, hat), HAT_GHOST, HAT_EDGE, 1);
+xray(mesh(new THREE.CylinderGeometry(0.1135, 0.1135, 0.034, 48, 1, true), M.satin, 0, 0.026, 0, hat), HAT_GHOST, HAT_EDGE, 1);
+const brimPts = [[0.108, 0], [0.165, 0.001], [0.188, 0.01], [0.192, 0.018], [0.182, 0.012], [0.165, 0.007], [0.108, 0.007]].map(([r, y]) => new THREE.Vector2(r, y));
+xray(mesh(new THREE.LatheGeometry(brimPts, 64), M.felt, 0, 0, 0, hat), HAT_GHOST, HAT_EDGE, 25);
+const openRing = only(mesh(new THREE.TorusGeometry(0.108, 0.004, 8, 48), new THREE.MeshBasicMaterial({ color: 0x72e0ff }), 0, HAT_H, 0, hat), 'xray');
+openRing.rotation.x = Math.PI / 2;
+hat.traverse(o => { if (o.isMesh) o.castShadow = true; });
+const hatGrip = new THREE.Object3D(); hatGrip.position.set(0, 0.13, 0); hat.add(hatGrip);
+
+// ---------- rabbit ----------
+const rabbit = new THREE.Group(); scene.add(rabbit);
+const rb = new THREE.Group(); rb.scale.setScalar(0.75); rabbit.add(rb);
+const S = (r) => new THREE.SphereGeometry(r, 24, 16);
+const body = mesh(S(1), M.fur, 0, 0.075, 0, rb); body.scale.set(0.07, 0.08, 0.065);
+[-1, 1].forEach(s => {
+  mesh(S(0.045), M.fur, s * 0.04, 0.045, -0.005, rb);
+  const foot = mesh(S(1), M.fur, s * 0.03, 0.012, 0.035, rb); foot.scale.set(0.02, 0.012, 0.04);
+  mesh(S(0.028), M.fur, s * 0.022, 0.155, 0.055, rb);
+  mesh(S(0.008), M.eye, s * 0.027, 0.182, 0.062, rb);
+});
+mesh(S(0.047), M.fur, 0, 0.17, 0.025, rb);
+mesh(S(0.007), M.pink, 0, 0.163, 0.077, rb);
+mesh(S(0.025), M.fur, 0, 0.06, -0.068, rb);
+const ears = [-1, 1].map(s => {
+  const pivot = new THREE.Group(); pivot.position.set(s * 0.018, 0.205, 0.015); rb.add(pivot);
+  const outer = mesh(new THREE.CapsuleGeometry(0.013, 0.075, 6, 12), M.fur, 0, 0.05, 0, pivot); outer.scale.z = 0.55;
+  const inner = mesh(new THREE.CapsuleGeometry(0.008, 0.06, 6, 12), M.pink, 0, 0.05, 0.005, pivot); inner.scale.z = 0.4;
+  pivot.userData.s = s; return pivot;
+});
+const earTop = new THREE.Object3D(); earTop.position.set(0, 0.33, 0); rb.add(earTop);
+rabbit.traverse(o => { if (o.isMesh) o.castShadow = true; });
+
+// ---------- gloves ----------
+function makeGlove(m) {
+  const g = new THREE.Group();
+  const palm = mesh(S(1), M.glove, 0, 0, 0, g); palm.scale.set(0.042, 0.05, 0.021);
+  for (let i = 0; i < 4; i++) {
+    const f = mesh(new THREE.CapsuleGeometry(0.0095, 0.042 - Math.abs(i - 1.5) * 0.006, 4, 10), M.glove, (-0.027 + i * 0.018) * m, 0.076 - Math.abs(i - 1.5) * 0.006, 0.004, g);
+    f.rotation.z = (i - 1.5) * -0.07 * m; f.rotation.x = 0.18;
+  }
+  const th = mesh(new THREE.CapsuleGeometry(0.01, 0.03, 4, 10), M.glove, 0.046 * m, 0.006, 0.01, g); th.rotation.z = -0.9 * m;
+  mesh(new THREE.CylinderGeometry(0.043, 0.037, 0.045, 28, 1, true), new THREE.MeshStandardMaterial({ color: 0xf7f4ee, roughness: 0.75, side: THREE.DoubleSide }), 0, -0.07, 0, g);
+  g.traverse(o => { if (o.isMesh) o.castShadow = true; });
+  scene.add(g); return g;
+}
+const gloveL = makeGlove(1), gloveR = makeGlove(-1);
+
+// ---------- wand ----------
+const wand = new THREE.Group(); scene.add(wand);
+mesh(new THREE.CylinderGeometry(0.0065, 0.0065, 0.26, 12), M.wand, 0, 0.13, 0, wand);
+mesh(new THREE.CylinderGeometry(0.007, 0.007, 0.04, 12), M.tip, 0, 0.28, 0, wand);
+mesh(new THREE.CylinderGeometry(0.007, 0.007, 0.04, 12), M.tip, 0, -0.02, 0, wand);
+wand.traverse(o => { if (o.isMesh) o.castShadow = true; });
+const WAND_TABLE = new THREE.Vector3(WAND_DOWN[0], TOP + 0.008, WAND_DOWN[2]);
+
+// rabbit's route, shown only in x-ray
+const route = only(new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0, PLAT_REST, 0), new THREE.Vector3(0, 1.62, 0)]),
+  new THREE.LineDashedMaterial({ color: 0x72e0ff, dashSize: 0.03, gapSize: 0.02, transparent: true, opacity: 0.6 })), 'xray');
+route.computeLineDistances(); scene.add(route);
+
+// ---------- pose: everything is a pure function of t ----------
+const tmp = new THREE.Vector3(), tmp2 = new THREE.Vector3(), Y = new THREE.Vector3(0, 1, 0);
+const REST_DIR = new THREE.Vector3(-0.2, 1, 0.1).normalize(), TABLE_DIR = new THREE.Vector3(1, 0, 0.15).normalize();
+const BRIM_HIT = new THREE.Vector3(0.13, TOP + HAT_H, 0.1);
+
+function pose(t) {
+  hat.position.copy(V(at(K.hatPos, t)));
+  hat.rotation.set(0, 0, at(K.hatRot, t));
+  hinge.rotation.x = at(K.trap, t);
+
+  const py = at(K.plat, t);
+  platform.position.set(0, py - 0.008, 0);
+  spring.scale.y = Math.max(0.02, py - 0.016 - spring.position.y);
+
+  const lifting = t > 7.0 && t < 10.8;
+  rabbit.position.set(0, lifting ? at(K.lift, t) : py, 0);
+  const show = t > 8.0 && t < 9.6 ? Math.sin((t - 8.0) / 1.6 * Math.PI) : 0;
+  rabbit.rotation.set(0, Math.sin(t * 5) * 0.35 * show, lifting ? Math.sin(t * 3.1) * 0.06 : 0);
+  ears.forEach(e => { e.rotation.z = -e.userData.s * (0.12 + (lifting ? 0 : 0.05 * Math.sin(t * 7 + e.userData.s))); e.rotation.x = lifting ? 0 : -0.15; });
+  scene.updateMatrixWorld();
+
+  // left glove steadies the hat from the front
+  const hl = at(K.holdL, t);
+  hatGrip.getWorldPosition(tmp).add(tmp2.set(-0.03, 0, 0.135));
+  gloveL.position.copy(V(L_REST)).lerp(tmp, hl);
+  gloveL.rotation.set(0, 0, -0.35 - hl * 0.25);
+
+  // right glove: wand, then the ears
+  const taps = t > 3.5 && t < 4.6 ? Math.abs(Math.sin((t - 3.5) / 1.1 * Math.PI * 3)) * 0.045 : 0;
+  const free = V(at(K.rFree, t)); free.y += taps;
+  earTop.getWorldPosition(tmp).y += 0.02;
+  gloveR.position.copy(free).lerp(tmp, at(K.grip, t));
+  gloveR.rotation.set(0, 0, at(K.rRot, t));
+
+  const inHand = t < 6.2 || t >= 12.6;
+  if (inHand) {
+    wand.position.copy(gloveR.position).y -= 0.02;
+    const dir = REST_DIR.clone().lerp(tmp.copy(BRIM_HIT).sub(wand.position).normalize(), at(K.aim, t)).lerp(TABLE_DIR, at(K.lay, t)).normalize();
+    wand.quaternion.setFromUnitVectors(Y, dir);
+  } else {
+    wand.position.copy(WAND_TABLE);
+    wand.quaternion.setFromUnitVectors(Y, TABLE_DIR);
+  }
+}
+
+// ---------- cameras ----------
+const camA = new THREE.PerspectiveCamera(34, 1, 0.05, 30);
+camA.position.set(0, 1.32, 2.7); camA.lookAt(0, 1.12, 0);
+const camX = new THREE.PerspectiveCamera(38, 1, 0.05, 30);
+camX.position.set(2.05, 1.6, 2.05); camX.lookAt(0, 0.86, 0);
+function fit(cam, aspect, hfovMin, vfovMin) {
+  cam.aspect = aspect;
+  const v = 2 * Math.atan(Math.tan(THREE.MathUtils.degToRad(hfovMin) / 2) / aspect);
+  cam.fov = Math.max(vfovMin, THREE.MathUtils.radToDeg(v));
+  cam.updateProjectionMatrix();
+}
+
+function setMode(mode) {
+  const x = mode === 'xray';
+  for (const s of swaps) s.mesh.material = x ? s.xray : s.show;
+  scene.traverse(o => { if (o.userData.only) o.visible = o.userData.only === mode; });
+  scene.background = x ? BG_XRAY : BG_SHOW;
+}
+
+// ---------- x-ray labels ----------
+const labelsEl = document.getElementById('labels');
+const LABELS = [
+  ['hat', 'Hat: open at both ends', () => hatGrip.getWorldPosition(tmp2).add(tmp.set(0.12, 0.05, 0))],
+  ['trap', 'Trap door', () => tmp2.set(0.07, TOP - 0.01, 0.07)],
+  ['spring', 'Spring lift', () => tmp2.set(0.05, (spring.position.y + platform.position.y) / 2, 0.02)],
+  ['rabbit', 'Rabbit', () => rabbit.getWorldPosition(tmp2).add(tmp.set(0.05, 0.11, 0))],
+  ['skirt', 'Velvet skirt hides the space below', () => tmp2.set(0.52, 0.32, 0.31)],
+].map(([id, text, fn]) => { const d = document.createElement('div'); d.className = 'xlabel'; d.textContent = text; labelsEl.appendChild(d); return { d, fn }; });
+
+// ---------- UI & clock ----------
+const $ = id => document.getElementById(id);
+const paneA = $('paneA'), paneX = $('paneX');
+let t = 0, speed = 1, playing = true, replay = false, view = 'split';
+const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+if (reduce) { playing = false; t = 7.6; }
+
+const ticks = $('ticks');
+PHASES.forEach(p => { const i = document.createElement('i'); i.style.left = `calc(${(p[0] / T) * 100}% )`; if (p[4]) i.className = 's'; i.title = p[1]; ticks.appendChild(i); });
+
+function setSpeed(s) { speed = s; $('sp1').setAttribute('aria-pressed', s === 1); $('sp4').setAttribute('aria-pressed', s !== 1); }
+function setPlaying(p) { playing = p; $('play').textContent = p ? 'Pause' : 'Play'; }
+setPlaying(playing);
+$('play').onclick = () => setPlaying(!playing);
+$('sp1').onclick = () => { replay = false; setSpeed(1); };
+$('sp4').onclick = () => setSpeed(0.25);
+$('replay').onclick = () => { t = 4.2; replay = true; setSpeed(0.25); setPlaying(true); };
+$('scrub').oninput = e => { t = +e.target.value; replay = false; setPlaying(false); };
+document.querySelectorAll('[data-view]').forEach(b => b.onclick = () => {
+  view = b.dataset.view;
+  document.querySelectorAll('[data-view]').forEach(o => o.setAttribute('aria-pressed', o === b));
+  paneA.hidden = view === 'xray'; paneX.hidden = view === 'audience';
+  document.body.classList.toggle('solo', view !== 'split');
+});
+addEventListener('keydown', e => {
+  if (e.target.tagName === 'INPUT' && e.key !== ' ') return;
+  if (e.key === ' ') { e.preventDefault(); setPlaying(!playing); }
+  else if (e.key === 'ArrowRight') { t = (t + 0.1) % T; setPlaying(false); }
+  else if (e.key === 'ArrowLeft') { t = (t - 0.1 + T) % T; setPlaying(false); }
+  else if (e.key === 'r' || e.key === 'R') $('replay').click();
+});
+
+let lastPhase = null;
+function ui() {
+  const s = t.toFixed(2);
+  $('time').textContent = `${s} / ${T} s`;
+  $('clockA').textContent = $('clockX').textContent = `t = ${s} s`;
+  $('scrub').value = t;
+  $('replayBadge').hidden = !replay;
+  const p = phaseAt(t);
+  if (p !== lastPhase) { lastPhase = p; $('phaseName').textContent = p[1]; $('capA').textContent = p[2]; $('capX').textContent = p[3]; }
+}
+
+function resize() {
+  const w = stageEl.clientWidth, h = stageEl.clientHeight;
+  renderer.setSize(w, h, false);
+}
+new ResizeObserver(resize).observe(stageEl); resize();
+
+function renderPane(pane, cam, mode, hfov, vfov) {
+  if (pane.hidden) return null;
+  const sr = stageEl.getBoundingClientRect(), r = pane.getBoundingClientRect();
+  const x = r.left - sr.left, y = sr.bottom - r.bottom, w = r.width, h = r.height;
+  if (w < 2 || h < 2) return null;
+  fit(cam, w / h, hfov, vfov);
+  setMode(mode);
+  renderer.setViewport(x, y, w, h); renderer.setScissor(x, y, w, h);
+  renderer.setScissorTest(true);
+  renderer.render(scene, cam);
+  return { x: r.left - sr.left, y: r.top - sr.top, w, h };
+}
+
+let prev = performance.now();
+function frame(now) {
+  const dt = Math.min(0.1, (now - prev) / 1000); prev = now;
+  if (playing) {
+    t += dt * speed;
+    if (replay && t >= 7.6) { replay = false; setSpeed(1); }
+    t %= T;
+  }
+  pose(t);
+  renderer.setScissorTest(false); renderer.setClearColor(0x0d0a0c); renderer.clear();
+  renderPane(paneA, camA, 'show', 40, 30);
+  const rx = renderPane(paneX, camX, 'xray', 44, 36);
+  labelsEl.hidden = !rx;
+  if (rx) {
+    const pr = paneX.getBoundingClientRect(), sr = stageEl.getBoundingClientRect();
+    for (const L of LABELS) {
+      const p = L.fn().project(camX);
+      const vis = p.z < 1 && Math.abs(p.x) < 1 && Math.abs(p.y) < 1;
+      L.d.hidden = !vis;
+      if (vis) { L.d.style.left = `${(p.x + 1) / 2 * pr.width}px`; L.d.style.top = `${(1 - p.y) / 2 * pr.height}px`; }
+    }
+  }
+  ui();
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+})();
+</script>
