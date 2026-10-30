@@ -1,0 +1,314 @@
+<title>Renewal X-ray</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=Source+Sans+3:wght@400;500;600&display=swap">
+<style>
+/* Layout: a statement on paper beside its own x-ray film. Left: the one number a renewal shows. Right: the parts inside it. Below: the questions it raises and your own numbers. */
+:root {
+  --paper: #f6f7f9;        /* page */
+  --sheet: #ffffff;        /* the renewal statement */
+  --ink: #18212b;
+  --muted: #5d6874;
+  --rule: #dfe3e8;
+  --film: #0b1a24;         /* x-ray panel, both themes */
+  --film-ink: #d9eef6;
+  --film-muted: #87a6b5;
+  --film-rule: #1c3443;
+  --scan: #5fd6f5;         /* the x-ray accent */
+  --up: #e0755a;           /* increases */
+  --c1: #5fd6f5; --c2: #f0b54a; --c3: #9a8cf0; --c4: #6fcf97; --c5: #e57fa8;
+  --chip-neg: #1f7a52; --chip-neg-bg: #e3f4ea;
+  --chip-shop: #8a5a00; --chip-shop-bg: #fbefd6;
+  --chip-law: #4c5866; --chip-law-bg: #e9edf1;
+  --display: "IBM Plex Sans Condensed", "Arial Narrow", "Roboto Condensed", sans-serif;
+  --body: "Source Sans 3", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #0f1418; --sheet: #172027; --ink: #e8edf1; --muted: #98a4ae; --rule: #26313a;
+    --film: #071219; --film-rule: #183140; --up: #f08a70;
+    --chip-neg: #8fe0b4; --chip-neg-bg: #143525; --chip-shop: #f3cb7a; --chip-shop-bg: #3a2c0e; --chip-law: #b8c3cd; --chip-law-bg: #24303a;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #0f1418; --sheet: #172027; --ink: #e8edf1; --muted: #98a4ae; --rule: #26313a;
+  --film: #071219; --film-rule: #183140; --up: #f08a70;
+  --chip-neg: #8fe0b4; --chip-neg-bg: #143525; --chip-shop: #f3cb7a; --chip-shop-bg: #3a2c0e; --chip-law: #b8c3cd; --chip-law-bg: #24303a;
+  color-scheme: dark;
+}
+body { background: var(--paper); color: var(--ink); font-family: var(--body); font-size: 16px; line-height: 1.5; }
+.wrap { max-width: 1180px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); padding-block: 32px 48px; display: grid; gap: 28px; }
+.num { font-variant-numeric: tabular-nums; }
+
+header { display: grid; gap: 10px; max-width: 760px; }
+.eyebrow { font-family: var(--mono); font-size: 12px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.sample { color: var(--chip-shop); background: var(--chip-shop-bg); padding: 2px 8px; border-radius: 2px; letter-spacing: 0.08em; }
+h1 { margin: 0; font-family: var(--display); font-weight: 700; font-size: clamp(30px, 4.6vw, 48px); line-height: 1.05; letter-spacing: -0.01em; text-wrap: balance; }
+h1 span { color: var(--muted); font-weight: 500; }
+.lede { margin: 0; color: var(--muted); max-width: 62ch; }
+
+.split { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 0; border-radius: 6px; overflow: hidden; box-shadow: 0 1px 0 var(--rule), 0 12px 40px rgba(10, 25, 35, 0.12); }
+@media (max-width: 860px) { .split { grid-template-columns: minmax(0, 1fr); } }
+.label { font-family: var(--mono); font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; }
+
+.sheet { background: var(--sheet); padding: 28px; display: grid; align-content: start; gap: 18px; border: 1px solid var(--rule); border-right: 0; }
+@media (max-width: 860px) { .sheet { border-right: 1px solid var(--rule); border-bottom: 0; } }
+.sheet .label { color: var(--muted); }
+.doc { border-top: 2px solid var(--ink); padding-top: 14px; display: grid; gap: 4px; }
+.doc .co { font-weight: 600; }
+.doc .meta { font-family: var(--mono); font-size: 12px; color: var(--muted); }
+.big { font-family: var(--display); font-weight: 700; font-size: clamp(54px, 8vw, 84px); line-height: 1; letter-spacing: -0.02em; }
+.big small { display: block; margin-top: 6px; font-size: 0.26em; font-weight: 500; color: var(--muted); letter-spacing: 0; }
+.delta { display: inline-flex; align-items: center; gap: 8px; font-family: var(--mono); font-size: 14px; color: var(--up); font-weight: 600; }
+.lines { display: grid; gap: 6px; border-top: 1px solid var(--rule); padding-top: 14px; font-size: 15px; }
+.lines div { display: flex; justify-content: space-between; gap: 12px; }
+.lines span:first-child { color: var(--muted); }
+.note { font-size: 14px; color: var(--muted); margin: 0; }
+
+.film { position: relative; background: var(--film); color: var(--film-ink); padding: 28px; display: grid; gap: 22px; align-content: start; overflow: hidden; }
+.film .label { color: var(--scan); }
+.film-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+.film-head p { margin: 0; color: var(--film-muted); font-size: 14px; }
+.film::after { content: ""; position: absolute; top: 0; bottom: 0; width: 120px; left: -140px; background: linear-gradient(90deg, transparent, rgba(95, 214, 245, 0.16), transparent); pointer-events: none; animation: sweep 2.4s ease-out 0.4s 1; }
+@keyframes sweep { to { left: 110%; } }
+@media (prefers-reduced-motion: reduce) { .film::after { animation: none; } }
+
+.stack { display: flex; height: 44px; border-radius: 3px; overflow: hidden; gap: 2px; }
+.stack div { min-width: 2px; position: relative; }
+.stack div span { position: absolute; left: 8px; top: 50%; transform: translateY(-50%); font-family: var(--mono); font-size: 12px; font-weight: 600; color: #071219; white-space: nowrap; }
+.scale { display: flex; justify-content: space-between; font-family: var(--mono); font-size: 11px; color: var(--film-muted); margin-top: 6px; }
+
+.parts { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 14px; color: inherit; min-width: 560px; }
+th { text-align: right; font-family: var(--mono); font-weight: 500; font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--film-muted); padding: 0 8px 8px; border-bottom: 1px solid var(--film-rule); }
+th:first-child { text-align: left; padding-left: 0; }
+td { padding: 10px 8px; border-bottom: 1px solid var(--film-rule); text-align: right; font-variant-numeric: tabular-nums; vertical-align: middle; }
+td:first-child { text-align: left; padding-left: 0; }
+.name { display: flex; align-items: center; gap: 10px; font-weight: 600; }
+.swatch { width: 10px; height: 10px; border-radius: 2px; flex: none; }
+.sub { display: block; font-weight: 400; color: var(--film-muted); font-size: 12px; }
+.chg { color: var(--up); font-weight: 600; }
+.chg.flat { color: var(--film-muted); font-weight: 400; }
+.share { display: flex; align-items: center; justify-content: flex-end; gap: 8px; }
+.share i { display: block; height: 8px; background: var(--up); border-radius: 1px; }
+.chip { display: inline-block; font-family: var(--mono); font-size: 11px; font-weight: 600; padding: 3px 7px; border-radius: 2px; white-space: nowrap; }
+.chip.neg { color: var(--chip-neg); background: var(--chip-neg-bg); }
+.chip.shop { color: var(--chip-shop); background: var(--chip-shop-bg); }
+.chip.law { color: var(--chip-law); background: var(--chip-law-bg); }
+tfoot td { font-weight: 600; border-bottom: 0; }
+
+.below { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: 28px; align-items: start; }
+@media (max-width: 860px) { .below { grid-template-columns: minmax(0, 1fr); } }
+h2 { margin: 0 0 4px; font-family: var(--display); font-weight: 600; font-size: 24px; line-height: 1.2; text-wrap: balance; }
+.hint { margin: 0 0 14px; color: var(--muted); font-size: 15px; }
+ol.asks { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; counter-reset: q; }
+ol.asks li { counter-increment: q; display: grid; grid-template-columns: 36px minmax(0, 1fr); gap: 4px 12px; padding: 14px 0; border-top: 1px solid var(--rule); }
+ol.asks li::before { content: counter(q); grid-row: span 2; font-family: var(--display); font-weight: 700; font-size: 28px; line-height: 1; color: var(--muted); }
+ol.asks b { font-weight: 600; }
+ol.asks span { color: var(--muted); font-size: 15px; }
+
+.inputs { background: var(--sheet); border: 1px solid var(--rule); border-radius: 6px; padding: 20px; display: grid; gap: 14px; }
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+label.f { display: grid; gap: 4px; font-size: 13px; color: var(--muted); }
+input[type="number"] { font: 500 15px var(--mono); color: var(--ink); background: var(--paper); border: 1px solid var(--rule); border-radius: 3px; padding: 7px 9px; width: 100%; box-sizing: border-box; font-variant-numeric: tabular-nums; }
+input:focus-visible, button:focus-visible { outline: 2px solid var(--scan); outline-offset: 2px; }
+.grid-in { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) minmax(0, 1fr); gap: 8px 10px; align-items: center; font-size: 14px; }
+.grid-in .h { font-family: var(--mono); font-size: 11px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+.btns { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+button { font: 600 14px var(--body); border-radius: 3px; padding: 8px 14px; cursor: pointer; border: 1px solid var(--rule); background: transparent; color: var(--ink); }
+button:hover { border-color: var(--muted); }
+.saved { font-size: 13px; color: var(--muted); }
+
+footer { border-top: 1px solid var(--rule); padding-top: 18px; display: grid; gap: 8px; color: var(--muted); font-size: 14px; }
+footer strong { color: var(--ink); font-weight: 600; font-size: 16px; }
+footer p { margin: 0; max-width: 80ch; }
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Renewal X-ray <span class="sample">Sample figures</span></div>
+    <h1>Your Insperity renewal is one number. <span>Here's what's inside it.</span></h1>
+    <p class="lede">A PEO renewal usually arrives as a single bundled rate. The same rate, split into its parts, shows which costs went up and which ones you can actually negotiate.</p>
+  </header>
+
+  <section class="split" aria-label="Renewal, bundled and broken out">
+    <div class="sheet">
+      <span class="label">What the renewal shows</span>
+      <div class="doc">
+        <span class="co">Example Co. · annual renewal</span>
+        <span class="meta" id="docMeta">42 employees · effective next plan year</span>
+      </div>
+      <div>
+        <div class="big num" id="bigRate">$1,540<small>per employee / month</small></div>
+        <div class="delta num" id="bigDelta">▲ 6.9% from $1,441</div>
+      </div>
+      <div class="lines num">
+        <div><span>Annual cost</span><b id="annual">$776,160</b></div>
+        <div><span>Increase per year</span><b id="annualUp">+$49,896</b></div>
+        <div><span>As a share of payroll</span><b id="pctPay">27.2%</b></div>
+      </div>
+      <p class="note">That's usually all the detail a renewal gives you: one rate and one percentage.</p>
+    </div>
+
+    <div class="film">
+      <div class="film-head">
+        <span class="label">X-ray · the same $1,540</span>
+        <p id="filmSub">Per employee per month, this year</p>
+      </div>
+      <div>
+        <div class="stack" id="stack" role="img" aria-label="Stacked bar of cost components"></div>
+        <div class="scale num" id="scale"></div>
+      </div>
+      <div class="parts">
+        <table>
+          <thead><tr><th>Part</th><th>Last year</th><th>This year</th><th>Change</th><th>Share of increase</th><th>Room to move</th></tr></thead>
+          <tbody id="rows"></tbody>
+          <tfoot><tr><td>Total</td><td id="totLast"></td><td id="totThis"></td><td id="totChg" class="chg"></td><td></td><td></td></tr></tfoot>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <section class="below">
+    <div>
+      <h2>Three questions to ask before you sign</h2>
+      <p class="hint">Ranked by how many dollars sit behind each one in this renewal.</p>
+      <ol class="asks" id="asks"></ol>
+    </div>
+
+    <form class="inputs" id="form" aria-label="Your own numbers">
+      <div>
+        <h2>Use your own numbers</h2>
+        <p class="hint" style="margin:0">Enter the per-employee monthly amounts from your renewal summary. Everything above updates.</p>
+      </div>
+      <div class="row2">
+        <label class="f" for="in-emp">Employees<input type="number" id="in-emp" min="1" step="1"></label>
+        <label class="f" for="in-wage">Average annual wage ($)<input type="number" id="in-wage" min="0" step="1000"></label>
+      </div>
+      <div class="grid-in" id="grid">
+        <span class="h">Per employee / month</span><span class="h">Last year</span><span class="h">This year</span>
+      </div>
+      <div class="btns">
+        <button type="button" id="reset">Reset to sample</button>
+        <span class="saved" id="saved">Showing sample figures</span>
+      </div>
+    </form>
+  </section>
+
+  <footer>
+    <strong>Want this with your real renewal?</strong>
+    <p>Send over your renewal summary and we'll build your own X-ray before the deadline to sign.</p>
+    <p>Sample figures for a fictional 42-person company. This is not an actual Insperity quote or invoice. Real renewals vary by state, industry, plan design and claims history. Insperity is a trademark of its owner and is named here only to describe the renewal being reviewed.</p>
+  </footer>
+</div>
+
+<script>
+(() => {
+'use strict';
+const SAMPLE = {
+  emp: 42, wage: 68000,
+  parts: [
+    { id: 'health', name: 'Health premiums', sub: 'Employer share, medical, dental, vision', last: 742, cur: 816, room: 'shop',
+      ask: 'Can we see the plan-level rates, and how do they compare with the open market for a group our size?' },
+    { id: 'admin', name: 'Admin / service fee', sub: 'The PEO’s own fee', last: 165, cur: 179, room: 'neg',
+      ask: 'What does the admin fee cover, and is it a flat amount per employee or a percent of payroll?' },
+    { id: 'tax', name: 'Payroll taxes', sub: 'FICA, FUTA, state unemployment', last: 464, cur: 466, room: 'law',
+      ask: 'Which state unemployment rate is being applied, ours or the PEO’s, and is it the lower one?' },
+    { id: 'wc', name: 'Workers’ comp', sub: 'Priced by job class code', last: 58, cur: 61, room: 'shop',
+      ask: 'Are our employees in the right workers’ comp class codes, and what is our experience mod?' },
+    { id: 'tech', name: 'Tech & add-on fees', sub: 'Software, onboarding, extras', last: 12, cur: 18, room: 'neg',
+      ask: 'Which add-on fees are we paying for, and which of them do we actually use?' },
+  ],
+};
+const ROOM = { neg: ['neg', 'Negotiable'], shop: ['shop', 'Shop the market'], law: ['law', 'Mostly set by law'] };
+const COLORS = ['--c1', '--c2', '--c3', '--c4', '--c5'];
+const KEY = 'renewal-xray-v1';
+
+const clone = o => JSON.parse(JSON.stringify(o));
+let data = clone(SAMPLE), custom = false;
+try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && s.parts && s.parts.length === SAMPLE.parts.length) { data = s; custom = true; } } catch (e) {}
+
+const $ = id => document.getElementById(id);
+const usd = n => '$' + Math.round(n).toLocaleString('en-US');
+const signed = n => (n > 0 ? '+' : n < 0 ? '−' : '') + usd(Math.abs(n));
+const pct = n => (n > 0 ? '+' : '') + n.toFixed(1) + '%';
+
+// inputs
+const grid = $('grid');
+data.parts.forEach((p, i) => {
+  const name = document.createElement('span'); name.textContent = SAMPLE.parts[i].name; grid.appendChild(name);
+  ['last', 'cur'].forEach(k => {
+    const inp = document.createElement('input'); inp.type = 'number'; inp.min = '0'; inp.step = '1';
+    inp.id = `in-${p.id}-${k}`; inp.setAttribute('aria-label', `${SAMPLE.parts[i].name}, ${k === 'last' ? 'last year' : 'this year'}`);
+    inp.dataset.i = i; inp.dataset.k = k; grid.appendChild(inp);
+  });
+});
+function fillInputs() {
+  $('in-emp').value = data.emp; $('in-wage').value = data.wage;
+  data.parts.forEach(p => { $(`in-${p.id}-last`).value = p.last; $(`in-${p.id}-cur`).value = p.cur; });
+}
+$('form').addEventListener('input', e => {
+  const t = e.target, v = Math.max(0, parseFloat(t.value) || 0);
+  if (t.id === 'in-emp') data.emp = Math.max(1, Math.round(v));
+  else if (t.id === 'in-wage') data.wage = v;
+  else data.parts[+t.dataset.i][t.dataset.k] = v;
+  custom = true;
+  try { localStorage.setItem(KEY, JSON.stringify(data)); } catch (err) {}
+  render();
+});
+$('form').addEventListener('submit', e => e.preventDefault());
+$('reset').onclick = () => { data = clone(SAMPLE); custom = false; try { localStorage.removeItem(KEY); } catch (e) {} fillInputs(); render(); };
+
+function render() {
+  const P = data.parts.map((p, i) => ({ ...SAMPLE.parts[i], last: p.last, cur: p.cur, color: `var(${COLORS[i]})` }));
+  const last = P.reduce((s, p) => s + p.last, 0), cur = P.reduce((s, p) => s + p.cur, 0);
+  const up = cur - last, upPct = last ? up / last * 100 : 0;
+  const rise = P.reduce((s, p) => s + Math.max(0, p.cur - p.last), 0);
+
+  // the bundled view
+  $('docMeta').textContent = `${data.emp} employees · effective next plan year`;
+  $('bigRate').innerHTML = `${usd(cur)}<small>per employee / month</small>`;
+  $('bigDelta').textContent = `${up >= 0 ? '▲' : '▼'} ${Math.abs(upPct).toFixed(1)}% from ${usd(last)}`;
+  $('annual').textContent = usd(cur * data.emp * 12);
+  $('annualUp').textContent = signed(up * data.emp * 12);
+  $('pctPay').textContent = data.wage ? (cur * 12 / data.wage * 100).toFixed(1) + '%' : '—';
+
+  // the x-ray
+  document.querySelector('.film .label').textContent = `X-ray · the same ${usd(cur)}`;
+  const stack = $('stack'); stack.innerHTML = '';
+  P.forEach(p => {
+    const d = document.createElement('div'); d.style.flex = `${p.cur} 0 0`; d.style.background = p.color;
+    d.title = `${p.name}: ${usd(p.cur)}`;
+    if (cur && p.cur / cur > 0.14) d.innerHTML = `<span>${usd(p.cur)}</span>`;
+    stack.appendChild(d);
+  });
+  $('scale').innerHTML = `<span>$0</span><span>${usd(cur / 2)}</span><span>${usd(cur)}</span>`;
+
+  const maxShare = Math.max(1, ...P.map(p => Math.max(0, p.cur - p.last)));
+  $('rows').innerHTML = P.map(p => {
+    const d = p.cur - p.last, dp = p.last ? d / p.last * 100 : 0;
+    const share = rise ? Math.max(0, d) / rise * 100 : 0;
+    const [cls, txt] = ROOM[p.room];
+    return `<tr>
+      <td><span class="name"><span class="swatch" style="background:${p.color}"></span><span>${p.name}<span class="sub">${p.sub}</span></span></span></td>
+      <td>${usd(p.last)}</td><td>${usd(p.cur)}</td>
+      <td class="chg${Math.abs(dp) < 1 ? ' flat' : ''}">${signed(d)}<span class="sub">${pct(dp)}</span></td>
+      <td><span class="share"><i style="width:${Math.max(0, d) / maxShare * 70}px"></i>${share.toFixed(0)}%</span></td>
+      <td><span class="chip ${cls}">${txt}</span></td></tr>`;
+  }).join('');
+  $('totLast').textContent = usd(last); $('totThis').textContent = usd(cur);
+  $('totChg').textContent = `${signed(up)} (${pct(upPct)})`;
+
+  // questions, ranked by dollars of increase per year
+  const ranked = P.map(p => ({ p, yr: (p.cur - p.last) * data.emp * 12 })).sort((a, b) => b.yr - a.yr).slice(0, 3);
+  $('asks').innerHTML = ranked.map(({ p, yr }) =>
+    `<li><b>${p.ask}</b><span>${p.name}: ${signed(yr)} a year across ${data.emp} employees.</span></li>`).join('');
+
+  $('saved').textContent = custom ? 'Showing your numbers, saved in this browser only' : 'Showing sample figures';
+}
+fillInputs(); render();
+})();
+</script>
