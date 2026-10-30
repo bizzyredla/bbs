@@ -7,3 +7,5 @@ Open `index.html` in a browser. `renewal-xray.html` is a separate sales page tha
 `renewal-benchmark.html` extends that page with six example companies and a TriNet benchmark step (savings ranges, ROI and findings). All figures are illustrative placeholders. Everything is built in code, including the rabbit and the gloves. One clock drives the whole trick, so the split view, the x-ray, and the ¼-speed replay always show the same moment.
 
 Controls: Space plays and pauses, ← and → step 0.1 s, R replays the secret at ¼ speed.
+
+`renewal-machine.html` plays a renewal back as a coin machine: the front shows one number, the x-ray shows coins sorting into five cost tubes, the increase landing on top, and an illustrative TriNet benchmark returning coins.

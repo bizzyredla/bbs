@@ -1,0 +1,551 @@
+<title>The Renewal Machine</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=JetBrains+Mono:wght@400;600;700&family=Source+Sans+3:wght@400;500;600&display=swap">
+<style>
+/* Layout: a counting room. Header with the company picker and the three numbers that matter, two windows on one machine (front and x-ray) sharing one clock, a brass control rail. */
+:root {
+  --ink: #0b100f;          /* room */
+  --felt: #12241f;         /* counting-table green */
+  --brass: #d1ab55;
+  --paper: #f1ece1;
+  --muted: #9aa7a1;
+  --xray: #6fe0ff;
+  --xray-bg: #061219;
+  --up: #ff7a45;           /* the increase */
+  --save: #3ddc84;         /* coins coming back */
+  --line: #1f2c28;
+  --display: "IBM Plex Sans Condensed", "Arial Narrow", sans-serif;
+  --body: "Source Sans 3", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  color-scheme: dark;
+}
+html, body { height: 100%; }
+body { background: var(--ink); color: var(--paper); font-family: var(--body); font-size: 14px; display: grid; grid-template-rows: auto auto 1fr auto; overflow: hidden; }
+.wrap { padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+[hidden] { display: none !important; }
+
+header { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 20px; padding-block: 12px 10px; border-bottom: 1px solid var(--line); }
+h1 { margin: 0; font-family: var(--display); font-weight: 700; font-size: clamp(22px, 2.6vw, 30px); letter-spacing: 0.01em; line-height: 1; }
+h1 em { font-style: normal; color: var(--brass); }
+.picker { display: flex; flex-wrap: wrap; gap: 6px; }
+.picker button { font: 500 13px var(--body); color: var(--paper); background: transparent; border: 1px solid #34413c; padding: 6px 10px; border-radius: 3px; cursor: pointer; }
+.picker button:hover { border-color: var(--brass); }
+.picker button[aria-pressed="true"] { background: var(--brass); border-color: var(--brass); color: var(--ink); font-weight: 600; }
+.phase { margin-left: auto; font-family: var(--mono); font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--brass); }
+.phase b { color: var(--paper); font-weight: 600; }
+
+.ribbon { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-bottom: 1px solid var(--line); background: var(--felt); }
+.ribbon > div { padding-block: 10px; padding-inline: 16px; display: grid; gap: 2px; min-width: 0; }
+.ribbon > div + div { border-left: 1px solid var(--line); }
+.ribbon .k { font-family: var(--mono); font-size: 10.5px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+.ribbon .v { font-family: var(--display); font-weight: 700; font-size: clamp(18px, 2.2vw, 26px); line-height: 1.1; font-variant-numeric: tabular-nums; }
+.ribbon .v.up { color: var(--up); }
+.ribbon .v.save { color: var(--save); }
+.ribbon .s { font-size: 12.5px; color: var(--muted); }
+
+.stage { position: relative; min-height: 0; }
+.stage canvas { position: absolute; inset: 0; width: 100%; height: 100%; display: block; }
+.panes { position: absolute; inset: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 2px; pointer-events: none; }
+.pane { position: relative; min-width: 0; min-height: 0; overflow: hidden; }
+body.solo .panes { grid-template-columns: 1fr; }
+.tag { position: absolute; top: 12px; left: 12px; font-family: var(--mono); font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; padding: 4px 8px; background: rgba(11, 16, 15, 0.72); border: 1px solid var(--brass); color: var(--brass); }
+#paneX .tag { border-color: var(--xray); color: var(--xray); background: rgba(6, 18, 25, 0.78); }
+.clock { position: absolute; top: 12px; right: 12px; font-family: var(--mono); font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; background: rgba(11, 16, 15, 0.6); padding: 4px 8px; }
+.cap { position: absolute; left: 12px; right: 12px; bottom: 12px; max-width: 48ch; margin: 0; font-size: 15px; line-height: 1.4; padding: 8px 12px; background: rgba(11, 16, 15, 0.8); border-left: 2px solid var(--brass); }
+#paneX .cap { border-left-color: var(--xray); background: rgba(6, 18, 25, 0.84); }
+.cap:empty { display: none; }
+.xlabel { position: absolute; transform: translate(-50%, 0); font-family: var(--mono); font-size: 11px; line-height: 1.3; text-align: center; white-space: nowrap; pointer-events: none; color: var(--paper); text-shadow: 0 0 6px var(--xray-bg), 0 0 2px var(--xray-bg); }
+.xlabel b { display: block; font-weight: 700; }
+.xlabel.tray { color: var(--save); }
+
+.rail { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; padding-block: 10px max(10px, env(safe-area-inset-bottom, 0px)); border-top: 1px solid var(--line); background: #0e1513; }
+button { font: 500 13px var(--body); color: var(--paper); background: transparent; border: 1px solid #34413c; padding: 7px 12px; border-radius: 3px; cursor: pointer; }
+button:hover { border-color: var(--brass); }
+button:focus-visible, input:focus-visible { outline: 2px solid var(--brass); outline-offset: 2px; }
+button.primary { background: var(--brass); color: var(--ink); border-color: var(--brass); font-weight: 600; min-width: 74px; }
+button.secret { border-color: var(--up); color: var(--up); }
+.seg { display: inline-flex; border: 1px solid #34413c; border-radius: 3px; overflow: hidden; }
+.seg button { border: 0; border-radius: 0; padding: 7px 10px; }
+.seg button[aria-pressed="true"] { background: var(--felt); color: var(--paper); box-shadow: inset 0 -2px 0 var(--brass); }
+.time { font-family: var(--mono); font-size: 13px; font-variant-numeric: tabular-nums; min-width: 9ch; }
+.scrub { position: relative; flex: 1 1 240px; min-width: 0; height: 30px; display: flex; align-items: center; }
+.scrub input { width: 100%; margin: 0; accent-color: var(--brass); position: relative; z-index: 1; }
+.ticks { position: absolute; inset: 0; pointer-events: none; }
+.ticks i { position: absolute; top: 2px; width: 2px; height: 7px; background: var(--brass); opacity: 0.8; }
+.ticks i.up { background: var(--up); }
+.ticks i.save { background: var(--save); }
+.fine { flex-basis: 100%; margin: 0; font-size: 11.5px; color: var(--muted); }
+
+@media (max-width: 820px), (max-aspect-ratio: 1/1) {
+  body { overflow: auto; grid-template-rows: auto auto minmax(560px, 78vh) auto; }
+  .panes { grid-template-columns: 1fr; grid-template-rows: 1fr 1fr; }
+  body.solo .panes { grid-template-rows: 1fr; }
+  .phase { margin-left: 0; flex-basis: 100%; }
+  .cap { font-size: 13px; padding: 6px 10px; }
+  .ribbon { grid-template-columns: minmax(0, 1fr); }
+  .ribbon > div + div { border-left: 0; border-top: 1px solid var(--line); }
+}
+</style>
+
+<header class="wrap">
+  <h1>The Renewal <em>Machine</em></h1>
+  <div class="picker" id="picker" role="group" aria-label="Pick a company like yours"></div>
+  <span class="phase">Now: <b id="phaseName">Last year</b></span>
+</header>
+
+<section class="ribbon" aria-label="What this renewal means">
+  <div><span class="k">This renewal adds</span><span class="v up" id="rUp"></span><span class="s" id="rUpS"></span></div>
+  <div><span class="k">In people terms</span><span class="v" id="rPeople"></span><span class="s" id="rPeopleS"></span></div>
+  <div><span class="k">TriNet benchmark could return</span><span class="v save" id="rSave"></span><span class="s" id="rSaveS"></span></div>
+</section>
+
+<main class="stage" id="stage">
+  <canvas id="c" aria-label="Two synchronized views of a coin machine that shows a PEO renewal"></canvas>
+  <div class="panes">
+    <section class="pane" id="paneA">
+      <span class="tag">What your renewal shows</span>
+      <span class="clock" id="clockA">t = 0.00 s</span>
+      <p class="cap" id="capA"></p>
+    </section>
+    <section class="pane" id="paneX">
+      <span class="tag">X-ray · same second</span>
+      <span class="clock" id="clockX">t = 0.00 s</span>
+      <div id="labels"></div>
+      <p class="cap" id="capX"></p>
+    </section>
+  </div>
+</main>
+
+<footer class="rail wrap">
+  <button class="primary" id="play" type="button">Pause</button>
+  <span class="time" id="time">0.00 / 20 s</span>
+  <div class="scrub">
+    <div class="ticks" id="ticks"></div>
+    <input id="scrub" type="range" min="0" max="20" step="0.01" value="0" aria-label="Playback timeline in seconds">
+  </div>
+  <button class="secret" id="replay" type="button">Replay the increase at ¼ speed</button>
+  <div class="seg" role="group" aria-label="Playback speed">
+    <button type="button" id="sp1" aria-pressed="true">1×</button>
+    <button type="button" id="sp4" aria-pressed="false">¼×</button>
+  </div>
+  <div class="seg" role="group" aria-label="View">
+    <button type="button" data-view="split" aria-pressed="true">Split</button>
+    <button type="button" data-view="audience" aria-pressed="false">Front</button>
+    <button type="button" data-view="xray" aria-pressed="false">X-ray</button>
+  </div>
+  <p class="fine">Example companies with illustrative figures. Each coin is $10 per employee per month. The TriNet benchmark is an illustrative range, not a quote. Insperity and TriNet are named only to describe the renewal and the benchmark.</p>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.149.0/build/three.min.js"></script>
+<script>
+(() => {
+'use strict';
+const T = 20;
+const COIN = 10;
+const SCALE = 0.8;                     // keeps the illustrative benchmark conservative                       // dollars per coin, per employee per month
+const TH = 0.0105;                     // coin thickness
+const PARTS = [
+  { id: 'health', name: 'Health', color: 0x5fd6f5 },
+  { id: 'admin', name: 'Admin fee', color: 0xf0b54a },
+  { id: 'tax', name: 'Payroll taxes', color: 0x9a8cf0 },
+  { id: 'wc', name: 'Workers’ comp', color: 0xe9e3cf },
+  { id: 'addon', name: 'Add-ons', color: 0xe57fa8 },
+];
+// last year, this year (per employee per month) and the midpoint of an illustrative benchmark saving
+const COMPANIES = [
+  { id: 'healthtech', name: 'Healthcare tech', emp: 35, wage: 118000,
+    p: { health: [860, 955], admin: [190, 205], tax: [781, 784], wc: [9, 10], addon: [24, 30] },
+    s: { health: 0.11, admin: 0.15, tax: 0, wc: 0.025, addon: 0.6 } },
+  { id: 'realestate', name: 'Real estate', emp: 20, wage: 72000,
+    p: { health: [690, 770], admin: [175, 189], tax: [493, 495], wc: [14, 15], addon: [20, 26] },
+    s: { health: 0.09, admin: 0.17, tax: 0, wc: 0.04, addon: 0.5 } },
+  { id: 'cpa', name: 'Professional services', emp: 48, wage: 85000,
+    p: { health: [760, 828], admin: [160, 172], tax: [574, 576], wc: [8, 8], addon: [15, 19] },
+    s: { health: 0.075, admin: 0.14, tax: 0, wc: 0.015, addon: 0.45 } },
+  { id: 'mfg', name: 'Manufacturing', emp: 85, wage: 54000,
+    p: { health: [640, 702], admin: [140, 150], tax: [380, 382], wc: [145, 168], addon: [10, 12] },
+    s: { health: 0.075, admin: 0.115, tax: 0, wc: 0.13, addon: 0.35 } },
+  { id: 'dental', name: 'Dental group', emp: 60, wage: 58000,
+    p: { health: [610, 671], admin: [150, 162], tax: [403, 405], wc: [30, 33], addon: [18, 22] },
+    s: { health: 0.085, admin: 0.14, tax: 0, wc: 0.05, addon: 0.45 } },
+  { id: 'nonprofit', name: 'Nonprofit', emp: 30, wage: 62000,
+    p: { health: [700, 770], admin: [155, 168], tax: [423, 425], wc: [12, 13], addon: [12, 16] },
+    s: { health: 0.09, admin: 0.15, tax: 0, wc: 0.025, addon: 0.5 } },
+];
+
+const usd = n => (n < 0 ? '−' : '') + '$' + Math.round(Math.abs(n)).toLocaleString('en-US');
+const clamp01 = x => Math.max(0, Math.min(1, x));
+const io = x => x * x * (3 - 2 * x);
+
+// ---------- renderer & scene ----------
+const canvas = document.getElementById('c'), stageEl = document.getElementById('stage');
+const renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.outputEncoding = THREE.sRGBEncoding;
+renderer.toneMapping = THREE.ACESFilmicToneMapping;
+renderer.toneMappingExposure = 1.0;
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+renderer.autoClear = false;
+const scene = new THREE.Scene();
+const BG_SHOW = new THREE.Color(0x0b100f), BG_XRAY = new THREE.Color(0x061219);
+
+const swaps = [];
+const ghost = (color, op) => new THREE.MeshBasicMaterial({ color, transparent: true, opacity: op, depthWrite: false, side: THREE.DoubleSide });
+const GHOST = ghost(0x6fe0ff, 0.04), GHOST_EDGE = new THREE.LineBasicMaterial({ color: 0x6fe0ff, transparent: true, opacity: 0.45 });
+function xray(m, mat = GHOST, edge = GHOST_EDGE, angle = 30) {
+  swaps.push({ mesh: m, show: m.material, xray: mat });
+  const l = new THREE.LineSegments(new THREE.EdgesGeometry(m.geometry, angle), edge); l.userData.only = 'xray'; m.add(l); return m;
+}
+const only = (o, mode) => { o.userData.only = mode; return o; };
+function mesh(geo, mat, x = 0, y = 0, z = 0, parent = scene) { const m = new THREE.Mesh(geo, mat); m.position.set(x, y, z); parent.add(m); return m; }
+
+scene.add(new THREE.HemisphereLight(0xfff0d8, 0x0b1a16, 0.35));
+const key = new THREE.SpotLight(0xfff1dc, 1.6, 14, 0.5, 0.6, 1.1);
+key.position.set(1.8, 5.2, 4.6); key.target.position.set(0, 1.3, 0);
+key.castShadow = true; key.shadow.mapSize.set(1024, 1024); key.shadow.bias = -0.0004;
+scene.add(key, key.target);
+const fill = new THREE.PointLight(0x6fe0ff, 0.35, 8); fill.position.set(-3, 2.5, 2); scene.add(fill);
+const inner = new THREE.PointLight(0xfff1dc, 0.9, 4); inner.position.set(0, 2.1, 0.2); scene.add(inner);
+
+const M = {
+  floor: new THREE.MeshStandardMaterial({ color: 0x14231f, roughness: 0.95 }),
+  wall: new THREE.MeshStandardMaterial({ color: 0x0f1a17, roughness: 1 }),
+  lacquer: new THREE.MeshStandardMaterial({ color: 0x173a31, roughness: 0.35, metalness: 0.2 }),
+  brass: new THREE.MeshStandardMaterial({ color: 0xd1ab55, roughness: 0.3, metalness: 0.85 }),
+  dark: new THREE.MeshStandardMaterial({ color: 0x050807, roughness: 0.6 }),
+  coin: new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.32, metalness: 0.75 }),
+  tray: new THREE.MeshStandardMaterial({ color: 0x2a2418, roughness: 0.5, metalness: 0.6 }),
+};
+
+// room
+const floor = only(mesh(new THREE.PlaneGeometry(20, 20), M.floor), 'show'); floor.rotation.x = -Math.PI / 2; floor.receiveShadow = true;
+only(mesh(new THREE.PlaneGeometry(20, 8), M.wall, 0, 4, -2.5), 'show');
+const grid = only(new THREE.GridHelper(10, 40, 0x1d4a5c, 0x0e2733), 'xray'); scene.add(grid);
+
+// ---------- the machine ----------
+const W = 3.0, H = 2.6, D = 0.8, Y0 = 0.1;      // cabinet sits on a short plinth
+const cab = new THREE.Group(); scene.add(cab);
+const panel = (w, h, d, x, y, z, mat = M.lacquer) => { const m = xray(mesh(new THREE.BoxGeometry(w, h, d), mat, x, y, z, cab)); m.castShadow = true; m.receiveShadow = true; return m; };
+panel(W + 0.16, Y0, D + 0.16, 0, Y0 / 2, 0, M.brass);                   // plinth
+panel(W, H, 0.04, 0, Y0 + H / 2, -D / 2);                                // back
+panel(0.04, H, D, -W / 2, Y0 + H / 2, 0); panel(0.04, H, D, W / 2, Y0 + H / 2, 0);
+panel(W, 0.04, D, -0, Y0 + H, 0);                                         // top (slot drawn on it)
+panel(W, H, 0.04, 0, Y0 + H / 2, D / 2);                                  // front
+panel(W + 0.06, 0.05, D + 0.06, 0, Y0 + H + 0.03, 0, M.brass);            // cornice
+only(mesh(new THREE.BoxGeometry(0.42, 0.012, 0.06), M.dark, 0, Y0 + H + 0.06, 0), 'show');   // coin slot
+mesh(new THREE.BoxGeometry(0.5, 0.02, 0.12), M.brass, 0, Y0 + H + 0.055, 0).castShadow = true;
+// return chute plate at the front bottom
+only(mesh(new THREE.BoxGeometry(0.9, 0.08, 0.02), M.dark, 0, 0.42, D / 2 + 0.025), 'show');
+mesh(new THREE.BoxGeometry(1.0, 0.16, 0.03), M.brass, 0, 0.42, D / 2 + 0.018);
+
+// display on the front
+const disp = document.createElement('canvas'); disp.width = 1024; disp.height = 300;
+const dctx = disp.getContext('2d'), dtex = new THREE.CanvasTexture(disp); dtex.encoding = THREE.sRGBEncoding;
+only(mesh(new THREE.BoxGeometry(1.86, 0.62, 0.03), M.brass, 0, 2.08, D / 2 + 0.02), 'show');
+only(mesh(new THREE.PlaneGeometry(1.76, 0.52), new THREE.MeshBasicMaterial({ map: dtex, toneMapped: false }), 0, 2.08, D / 2 + 0.04), 'show');
+let lastDisp = '';
+function drawDisplay(label, value, sub, mode) {
+  const key = label + value + sub + mode; if (key === lastDisp) return; lastDisp = key;
+  const c = dctx; c.fillStyle = '#04110c'; c.fillRect(0, 0, 1024, 300);
+  const col = mode === 'up' ? '#ff8a5c' : mode === 'save' ? '#5cf09a' : '#e9dcb4';
+  c.fillStyle = 'rgba(233,220,180,0.55)'; c.font = '600 34px "JetBrains Mono", monospace'; c.textBaseline = 'top'; c.fillText(label, 40, 26);
+  c.fillStyle = col; c.font = '700 132px "JetBrains Mono", monospace'; c.fillText(value, 34, 74);
+  c.fillStyle = mode ? col : 'rgba(233,220,180,0.75)'; c.font = '600 36px "JetBrains Mono", monospace'; c.fillText(sub, 40, 230);
+  dtex.needsUpdate = true;
+}
+
+// receipt printer on the top right
+const rc = document.createElement('canvas'); rc.width = 360; rc.height = 560;
+const rctx = rc.getContext('2d'), rtex = new THREE.CanvasTexture(rc); rtex.encoding = THREE.sRGBEncoding;
+mesh(new THREE.BoxGeometry(0.6, 0.12, 0.3), M.brass, 0.95, Y0 + H + 0.1, 0.1).castShadow = true;
+const receipt = new THREE.Group(); receipt.position.set(0.95, Y0 + H + 0.16, 0.12); scene.add(receipt);
+const paper = mesh(new THREE.PlaneGeometry(0.46, 0.72), new THREE.MeshStandardMaterial({ map: rtex, roughness: 0.9, side: THREE.DoubleSide }), 0, 0.36, 0, receipt);
+paper.rotation.x = -0.12;
+function drawReceipt(c, d) {
+  const x = rctx; x.fillStyle = '#f4efe2'; x.fillRect(0, 0, 360, 560);
+  x.fillStyle = '#1b1a17'; x.textBaseline = 'top'; x.font = '700 26px "JetBrains Mono", monospace'; x.fillText('RENEWAL NOTICE', 24, 26);
+  x.font = '400 18px "JetBrains Mono", monospace'; x.fillText(c.name.toUpperCase(), 24, 64); x.fillText(`${c.emp} EMPLOYEES`, 24, 88);
+  x.fillRect(24, 122, 312, 2);
+  x.font = '400 20px "JetBrains Mono", monospace'; x.fillText('NEW RATE / EE / MO', 24, 142);
+  x.font = '700 54px "JetBrains Mono", monospace'; x.fillText(usd(d.now), 24, 170);
+  x.fillStyle = '#c4451f'; x.font = '700 30px "JetBrains Mono", monospace'; x.fillText(`+${(d.up / d.last * 100).toFixed(1)}%`, 24, 240);
+  x.fillStyle = '#1b1a17'; x.font = '400 20px "JetBrains Mono", monospace'; x.fillText('ADDED PER YEAR', 24, 300);
+  x.font = '700 40px "JetBrains Mono", monospace'; x.fillText('+' + usd(d.upYr), 24, 326);
+  x.font = '400 18px "JetBrains Mono", monospace'; x.fillStyle = '#6b665a';
+  x.fillText('ITEMIZED: NO', 24, 400); x.fillText('SIGN BY: 30 DAYS', 24, 426);
+  for (let i = 0; i < 18; i++) { x.fillStyle = '#f4efe2'; x.beginPath(); x.moveTo(i * 20, 560); x.lineTo(i * 20 + 10, 548); x.lineTo(i * 20 + 20, 560); x.fill(); }
+  x.fillStyle = '#ddd5c2'; x.fillRect(0, 548, 360, 12);
+  rtex.needsUpdate = true;
+}
+
+// inside: a sorting rail and five glass tubes
+const TUBE_X = [-1.12, -0.56, 0, 0.56, 1.12], TUBE_BASE = 0.62, TUBE_H = 1.12, RAIL_Y = 1.95, R = 0.165;
+const railMat = new THREE.MeshStandardMaterial({ color: 0x8b98a0, roughness: 0.4, metalness: 0.8 });
+const rail = mesh(new THREE.BoxGeometry(2.6, 0.03, 0.3), railMat, 0, RAIL_Y - 0.03, 0); swaps.push({ mesh: rail, show: railMat, xray: railMat });
+const tubes = PARTS.map((p, i) => {
+  const glass = new THREE.MeshStandardMaterial({ color: p.color, transparent: true, opacity: 0.16, roughness: 0.1, depthWrite: false, side: THREE.DoubleSide });
+  const t = mesh(new THREE.CylinderGeometry(R, R, TUBE_H, 40, 1, true), glass, TUBE_X[i], TUBE_BASE + TUBE_H / 2, 0);
+  const e = new THREE.LineSegments(new THREE.EdgesGeometry(t.geometry, 1), new THREE.LineBasicMaterial({ color: p.color, transparent: true, opacity: 0.9 })); t.add(e);
+  mesh(new THREE.CylinderGeometry(R + 0.02, R + 0.02, 0.04, 40), M.brass, TUBE_X[i], TUBE_BASE - 0.02, 0);
+  const lastRing = only(mesh(new THREE.TorusGeometry(R + 0.012, 0.006, 6, 48), new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.85 }), TUBE_X[i], 0, 0), 'xray');
+  lastRing.rotation.x = Math.PI / 2;
+  const benchRing = only(mesh(new THREE.TorusGeometry(R + 0.03, 0.009, 6, 48), new THREE.MeshBasicMaterial({ color: 0x3ddc84 }), TUBE_X[i], 0, 0), 'xray');
+  benchRing.rotation.x = Math.PI / 2;
+  return { glass: t, lastRing, benchRing };
+});
+// coin return tray outside the front
+const TRAY = { x: 0, y: 0.1, z: D / 2 + 0.36 };
+const trayG = new THREE.Group(); trayG.position.set(TRAY.x, TRAY.y, TRAY.z); scene.add(trayG);
+[[1.24, 0.02, 0.5, 0, 0, 0], [1.24, 0.1, 0.02, 0, 0.05, 0.25], [1.24, 0.1, 0.02, 0, 0.05, -0.25], [0.02, 0.1, 0.5, 0.62, 0.05, 0], [0.02, 0.1, 0.5, -0.62, 0.05, 0]]
+  .forEach(([w, h, d, x, y, z]) => { const m = mesh(new THREE.BoxGeometry(w, h, d), M.tray, x, y, z, trayG); m.castShadow = true; m.receiveShadow = true; });
+
+// coins
+const MAXC = 260;
+const coins = new THREE.InstancedMesh(new THREE.CylinderGeometry(0.13, 0.13, TH * 0.92, 28), M.coin, MAXC);
+coins.castShadow = true; coins.instanceMatrix.setUsage(THREE.DynamicDrawUsage); scene.add(coins);
+const GOLD = new THREE.Color(0xd9b25a), UP = new THREE.Color(0xff6a35), SAVE = new THREE.Color(0x3ddc84);
+for (let i = 0; i < MAXC; i++) coins.setColorAt(i, GOLD);
+
+// ---------- the plan: every coin's schedule is computed once per company ----------
+let plan = null;
+function buildPlan(c) {
+  const tubesP = PARTS.map((p, i) => {
+    const [last, now] = c.p[p.id];
+    const lastN = Math.round(last / COIN), nowN = Math.round(now / COIN);
+    const saveN = Math.round(now * c.s[p.id] * SCALE / COIN);
+    return { i, last, now, lastN, nowN: Math.max(nowN, lastN), saveN: Math.min(saveN, nowN) };
+  });
+  const A = [], B = [], C = [];
+  tubesP.forEach(tp => { for (let k = 0; k < tp.nowN; k++) (k < tp.lastN ? A : B).push({ tube: tp.i, k, inc: k >= tp.lastN }); });
+  const order = (list, of) => list.sort((a, b) => (a.k + 0.5) / of(a) - (b.k + 0.5) / of(b) || a.tube - b.tube);
+  order(A, x => tubesP[x.tube].lastN); order(B, x => tubesP[x.tube].nowN - tubesP[x.tube].lastN);
+  A.forEach((cn, j) => cn.s = 1.0 + j * (5.6 / A.length));
+  B.forEach((cn, j) => cn.s = 8.4 + j * (2.8 / Math.max(1, B.length)));
+  const all = A.concat(B);
+  // the top coins of each tube come back in the benchmark act
+  tubesP.forEach(tp => { for (let k = tp.nowN - 1; k >= tp.nowN - tp.saveN; k--) C.push(all.find(cn => cn.tube === tp.i && cn.k === k)); });
+  C.sort((a, b) => b.k - a.k).forEach((cn, j) => { cn.back = 13.9 + j * (2.0 / Math.max(1, C.length)); cn.slot = j; });
+  const sum = f => tubesP.reduce((s, tp) => s + f(tp), 0);
+  const last = sum(t => t.last), now = sum(t => t.now), save = PARTS.reduce((s, p) => s + c.p[p.id][1] * c.s[p.id] * SCALE, 0);
+  return { c, tubes: tubesP, coins: all, A, B, C, last, now, up: now - last, save, upYr: (now - last) * c.emp * 12, saveYr: save * c.emp * 12 };
+}
+
+const tmpM = new THREE.Matrix4(), tmpQ = new THREE.Quaternion(), tmpE = new THREE.Euler(), tmpV = new THREE.Vector3(), tmpS = new THREE.Vector3();
+const ZERO = new THREE.Vector3(0, 0, 0), ONE = new THREE.Vector3(1, 1, 1);
+const stackY = k => TUBE_BASE + (k + 0.5) * TH;
+const trayPos = (j, out) => out.set(TRAY.x - 0.42 + (j % 4) * 0.28, TRAY.y + 0.02 + (Math.floor(j / 4) + 0.5) * TH, TRAY.z);
+
+function coinAt(cn, t, out) {
+  // returns {visible, spin} and writes position
+  const tx = TUBE_X[cn.tube];
+  let u = t - cn.s;
+  if (u < 0) return null;
+  const SLOT_Y = Y0 + H + 0.9, d1 = 0.32, d2 = 0.12 + Math.abs(tx) * 0.3, d3 = 0.34;
+  let spin = 0;
+  if (u < d1) { const f = u / d1; out.set(0, SLOT_Y + (RAIL_Y - SLOT_Y) * f * f, 0); spin = f * 0.5; }
+  else if (u < d1 + d2) { const f = io((u - d1) / d2); out.set(tx * f, RAIL_Y, 0); spin = 0.5 + f * 0.3; }
+  else if (u < d1 + d2 + d3) { const f = (u - d1 - d2) / d3; out.set(tx, RAIL_Y + (stackY(cn.k) - RAIL_Y) * f * f, 0); spin = 0.8 + f * 0.2; }
+  else out.set(tx, stackY(cn.k), 0), spin = 1;
+  if (cn.back !== undefined && t > cn.back) {
+    const v = t - cn.back, up = 0.3, arc = 0.75;
+    if (v < up) { const f = io(v / up); out.set(tx, stackY(cn.k) + (RAIL_Y + 0.05 - stackY(cn.k)) * f, 0); spin = 1; }
+    else {
+      const f = clamp01((v - up) / arc), p0 = tmpS.set(tx, RAIL_Y + 0.05, 0), p2 = trayPos(cn.slot, new THREE.Vector3());
+      const p1x = (tx + p2.x) / 2, p1y = 0.42, p1z = D / 2 + 0.05, g = 1 - f;
+      out.set(g * g * p0.x + 2 * g * f * p1x + f * f * p2.x, g * g * p0.y + 2 * g * f * p1y + f * f * p2.y, g * g * p0.z + 2 * g * f * p1z + f * f * p2.z);
+      spin = 1 + (f < 1 ? f * 1.0 : 1);
+    }
+  }
+  return spin;
+}
+
+function pose(t) {
+  const fadeOut = t > 19.2 ? 1 - clamp01((t - 19.2) / 0.7) : 1;
+  for (let i = 0; i < MAXC; i++) {
+    const cn = plan.coins[i];
+    let spin = cn ? coinAt(cn, t, tmpV) : null;
+    if (spin === null || fadeOut <= 0) { tmpM.compose(ZERO, tmpQ.identity(), ZERO); coins.setMatrixAt(i, tmpM); continue; }
+    tmpE.set(spin * Math.PI * 2, 0, 0); tmpQ.setFromEuler(tmpE);
+    tmpS.set(fadeOut, fadeOut, fadeOut);
+    tmpM.compose(tmpV, tmpQ, tmpS); coins.setMatrixAt(i, tmpM);
+    const col = cn.back !== undefined && t > cn.back ? SAVE : cn.inc ? UP : GOLD;
+    coins.setColorAt(i, col);
+  }
+  coins.instanceMatrix.needsUpdate = true; coins.instanceColor.needsUpdate = true;
+
+  plan.tubes.forEach((tp, i) => {
+    tubes[i].lastRing.position.y = TUBE_BASE + tp.lastN * TH;
+    tubes[i].lastRing.visible = t > 7.2 && t < 19.2;
+    tubes[i].benchRing.position.y = TUBE_BASE + (tp.nowN - tp.saveN) * TH;
+    tubes[i].benchRing.visible = t > 13.4 && t < 19.2 && tp.saveN > 0;
+  });
+
+  // the receipt prints after the increase lands
+  const r = clamp01((t - 11.4) / 1.0) * (t > 19.2 ? 1 - clamp01((t - 19.2) / 0.6) : 1);
+  receipt.scale.set(1, Math.max(0.001, r), 1); receipt.visible = r > 0.002;
+
+  // the display counts what has landed
+  const landed = (list, at) => list.filter(cn => t > cn.s + 0.9).length / Math.max(1, list.length);
+  const back = plan.C.filter(cn => t > cn.back + 1.05).length / Math.max(1, plan.C.length);
+  if (t < 7.6) drawDisplay('LAST YEAR · PER EMPLOYEE / MONTH', usd(plan.last * landed(plan.A)), t < 1 ? 'WAITING FOR THE RENEWAL' : 'ONE NUMBER. NO DETAIL.', '');
+  else if (t < 13.6) {
+    const v = plan.last + plan.up * landed(plan.B);
+    drawDisplay('RENEWAL · PER EMPLOYEE / MONTH', usd(v), t > 8.4 ? `+${((v - plan.last) / plan.last * 100).toFixed(1)}%  +${usd(v - plan.last)}` : 'RENEWAL ARRIVING', t > 8.4 ? 'up' : '');
+  } else if (t < 19.2) {
+    const v = plan.now - plan.save * back;
+    drawDisplay('TRINET BENCHMARK · ILLUSTRATIVE', usd(v), back > 0 ? `−${usd(plan.now - v)} PER EMPLOYEE / MONTH` : 'SAME PEOPLE. SAME COVERAGE.', 'save');
+  } else drawDisplay('NEXT RENEWAL', '$—', 'STARTING OVER', '');
+}
+
+// ---------- cameras ----------
+const camA = new THREE.PerspectiveCamera(36, 1, 0.05, 50); camA.position.set(0, 1.7, 6.6); camA.lookAt(0, 1.55, 0);
+const camX = new THREE.PerspectiveCamera(36, 1, 0.05, 50); camX.position.set(1.9, 2.3, 5.6); camX.lookAt(0, 1.35, 0.2);
+function fit(cam, aspect, hfov, vmin) {
+  cam.aspect = aspect;
+  cam.fov = Math.max(vmin, THREE.MathUtils.radToDeg(2 * Math.atan(Math.tan(THREE.MathUtils.degToRad(hfov) / 2) / aspect)));
+  cam.updateProjectionMatrix();
+}
+function setMode(mode) {
+  const x = mode === 'xray';
+  for (const s of swaps) s.mesh.material = x ? s.xray : s.show;
+  scene.traverse(o => { if (o.userData.only) o.visible = o.userData.only === mode; });
+  scene.background = x ? BG_XRAY : BG_SHOW;
+  inner.intensity = x ? 0.9 : 0;
+}
+
+// ---------- copy that changes with the company ----------
+const $ = id => document.getElementById(id);
+let PHASES = [];
+function buildCopy() {
+  const p = plan, c = p.c;
+  const incBy = p.tubes.map(tp => ({ name: PARTS[tp.i].name.toLowerCase(), n: tp.nowN - tp.lastN })).sort((a, b) => b.n - a.n);
+  const people = p.upYr / c.wage;
+  PHASES = [
+    [0.0, 'Last year', 'Every month, each employee costs money to keep on payroll.', 'Each coin is $10 per employee per month. Inside are five tubes, one for each part of the bill.'],
+    [1.0, 'Last year’s rate', 'Coins go in. The machine shows one number.', 'Inside, every coin sorts into health, admin fee, payroll taxes, workers’ comp or add-ons.'],
+    [7.4, 'The renewal arrives', 'The renewal letter comes in.', 'White rings mark where each tube stood last year. Watch above them.', 'up'],
+    [8.4, 'The increase', `The number climbs to ${usd(p.now)}. That is all you are told.`, `The new coins land on top in orange. Most go to ${incBy[0].name}${incBy[1].n ? `, then ${incBy[1].name}` : ''}.`, 'up'],
+    [11.4, 'The receipt', `+${usd(p.up)} per employee per month. Sign within 30 days.`, `That is ${usd(p.upYr)} a year, the same as ${people.toFixed(1)} of your employees’ salaries.`, 'up'],
+    [13.4, 'The benchmark', 'Same people, same coverage, priced against TriNet.', 'Green rings show an illustrative TriNet benchmark for each tube. Coins above them come back.', 'save'],
+    [16.2, 'Back in your budget', `${usd(p.saveYr)} a year back in your budget.`, 'Most of it comes from the tubes you can shop or negotiate. Payroll taxes do not move.', 'save'],
+    [19.2, 'Next renewal', '', ''],
+  ];
+  $('ticks').innerHTML = PHASES.map(ph => `<i class="${ph[4] || ''}" style="left:${ph[0] / T * 100}%" title="${ph[1]}"></i>`).join('');
+  $('rUp').textContent = `+${usd(p.upYr)} / yr`;
+  $('rUpS').textContent = `+${usd(p.up)} per employee per month, ${(p.up / p.last * 100).toFixed(1)}% over last year`;
+  $('rPeople').textContent = `${people.toFixed(1)} salaries`;
+  $('rPeopleS').textContent = `The increase alone, at an average wage of ${usd(c.wage)}`;
+  $('rSave').textContent = `~${usd(p.saveYr)} / yr`;
+  $('rSaveS').textContent = `Illustrative benchmark for ${c.emp} employees, not a quote`;
+  lastPhase = null; lastDisp = '';
+  drawReceipt(c, p);
+}
+
+// x-ray labels
+const labelsEl = $('labels');
+const tubeLabels = PARTS.map(() => { const d = document.createElement('div'); d.className = 'xlabel'; labelsEl.appendChild(d); return d; });
+const trayLabel = document.createElement('div'); trayLabel.className = 'xlabel tray'; labelsEl.appendChild(trayLabel);
+function labelText(t) {
+  plan.tubes.forEach((tp, i) => {
+    const d = tp.nowN - tp.lastN, s = tp.saveN;
+    let extra = '';
+    if (t > 13.4 && t < 19.2 && s) extra = `<span style="color:#3ddc84">−${usd(tp.now * plan.c.s[PARTS[i].id] * SCALE)}</span>`;
+    else if (t > 8.4 && t < 19.2 && tp.now !== tp.last) extra = `<span style="color:#ff7a45">+${usd(tp.now - tp.last)}</span>`;
+    const html = `<b style="color:#${PARTS[i].color.toString(16).padStart(6, '0')}">${PARTS[i].name}</b>${usd(t > 8.4 ? tp.now : tp.last)} ${extra}`;
+    if (tubeLabels[i].innerHTML !== html) tubeLabels[i].innerHTML = html;
+  });
+  trayLabel.innerHTML = `<b>Back in your budget</b>${usd(plan.save)} / employee / month`;
+}
+
+// ---------- UI & clock ----------
+const paneA = $('paneA'), paneX = $('paneX');
+let t = 0, speed = 1, playing = true, replay = false, view = 'split', lastPhase = null;
+if (matchMedia('(prefers-reduced-motion: reduce)').matches) { playing = false; t = 12.6; }
+
+$('picker').innerHTML = COMPANIES.map(c => `<button type="button" data-id="${c.id}" aria-pressed="false">${c.name} · ${c.emp}</button>`).join('');
+function pick(id) {
+  plan = buildPlan(COMPANIES.find(c => c.id === id));
+  document.querySelectorAll('#picker button').forEach(b => b.setAttribute('aria-pressed', b.dataset.id === id));
+  buildCopy();
+}
+$('picker').addEventListener('click', e => { const b = e.target.closest('button'); if (b) { pick(b.dataset.id); t = 0; setPlaying(true); } });
+pick('mfg');
+
+function setSpeed(s) { speed = s; $('sp1').setAttribute('aria-pressed', s === 1); $('sp4').setAttribute('aria-pressed', s !== 1); }
+function setPlaying(p) { playing = p; $('play').textContent = p ? 'Pause' : 'Play'; }
+setPlaying(playing);
+$('play').onclick = () => setPlaying(!playing);
+$('sp1').onclick = () => { replay = false; setSpeed(1); };
+$('sp4').onclick = () => setSpeed(0.25);
+$('replay').onclick = () => { t = 7.4; replay = true; setSpeed(0.25); setPlaying(true); };
+$('scrub').oninput = e => { t = +e.target.value; replay = false; setPlaying(false); };
+document.querySelectorAll('[data-view]').forEach(b => b.onclick = () => {
+  view = b.dataset.view;
+  document.querySelectorAll('[data-view]').forEach(o => o.setAttribute('aria-pressed', o === b));
+  paneA.hidden = view === 'xray'; paneX.hidden = view === 'audience';
+  document.body.classList.toggle('solo', view !== 'split');
+});
+addEventListener('keydown', e => {
+  if (e.target.tagName === 'INPUT' && e.key !== ' ') return;
+  if (e.key === ' ') { e.preventDefault(); setPlaying(!playing); }
+  else if (e.key === 'ArrowRight') { t = (t + 0.1) % T; setPlaying(false); }
+  else if (e.key === 'ArrowLeft') { t = (t - 0.1 + T) % T; setPlaying(false); }
+  else if (e.key === 'r' || e.key === 'R') $('replay').click();
+});
+if (document.fonts) document.fonts.ready.then(() => { lastDisp = ''; drawReceipt(plan.c, plan); });
+
+function ui() {
+  const s = t.toFixed(2);
+  $('time').textContent = `${s} / ${T} s`;
+  $('clockA').textContent = $('clockX').textContent = `t = ${s} s`;
+  $('scrub').value = t;
+  let ph = PHASES[0]; for (const q of PHASES) if (t >= q[0]) ph = q;
+  if (ph !== lastPhase) { lastPhase = ph; $('phaseName').textContent = ph[1] + (replay ? ' · replay ¼×' : ''); $('capA').textContent = ph[2]; $('capX').textContent = ph[3]; }
+}
+
+new ResizeObserver(() => renderer.setSize(stageEl.clientWidth, stageEl.clientHeight, false)).observe(stageEl);
+renderer.setSize(stageEl.clientWidth, stageEl.clientHeight, false);
+
+function renderPane(pane, cam, mode, hfov, vmin) {
+  if (pane.hidden) return null;
+  const sr = stageEl.getBoundingClientRect(), r = pane.getBoundingClientRect();
+  const x = r.left - sr.left, y = sr.bottom - r.bottom, w = r.width, h = r.height;
+  if (w < 2 || h < 2) return null;
+  fit(cam, w / h, hfov, vmin); setMode(mode);
+  renderer.setViewport(x, y, w, h); renderer.setScissor(x, y, w, h); renderer.setScissorTest(true);
+  renderer.render(scene, cam);
+  return r;
+}
+
+let prev = performance.now();
+function frame(now) {
+  const dt = Math.min(0.1, (now - prev) / 1000); prev = now;
+  if (playing) {
+    t += dt * speed;
+    if (replay && t >= 13.4) { replay = false; setSpeed(1); lastPhase = null; }
+    t %= T;
+  }
+  pose(t);
+  renderer.setScissorTest(false); renderer.setClearColor(0x0b100f); renderer.clear();
+  renderPane(paneA, camA, 'show', 44, 34);
+  const rx = renderPane(paneX, camX, 'xray', 50, 38);
+  labelsEl.hidden = !rx;
+  if (rx) {
+    labelText(t);
+    const place = (el, v) => {
+      const p = v.project(camX), ok = p.z < 1 && Math.abs(p.x) < 1.05 && Math.abs(p.y) < 1.05;
+      el.hidden = !ok; if (ok) { el.style.left = `${(p.x + 1) / 2 * rx.width}px`; el.style.top = `${(1 - p.y) / 2 * rx.height}px`; }
+    };
+    tubeLabels.forEach((el, i) => place(el, tmpV.set(TUBE_X[i], TUBE_BASE - 0.04 - (i % 2) * 0.24, 0.25)));
+    place(trayLabel, tmpV.set(TRAY.x, TRAY.y - 0.12, TRAY.z + 0.32));
+    trayLabel.hidden = trayLabel.hidden || t < 14.2 || t > 19.2;
+  }
+  ui();
+  requestAnimationFrame(frame);
+}
+requestAnimationFrame(frame);
+})();
+</script>
