@@ -1,0 +1,13 @@
+[build]
+  publish = "."
+  command = ""
+
+[[redirects]]
+  from = "/"
+  to = "/insperity/"
+  status = 302
+
+[[redirects]]
+  from = "/insperity"
+  to = "/insperity/"
+  status = 301

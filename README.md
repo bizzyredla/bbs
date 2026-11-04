@@ -1,11 +1,8 @@
-# Rabbit from a Hat
+# brandonibarra.com
 
-A three.js stage that shows the classic rabbit-from-a-hat trick twice at once: what the audience sees, and an x-ray of what's really happening. The hat is a tube, there's a trap in the tabletop, and the rabbit waits on a spring lift under the table.
+Static site deployed by Netlify from the `main` branch.
 
-Open `index.html` in a browser. `renewal-xray.html` is a separate sales page that applies the same idea to a PEO renewal, with sample figures you can replace.
+- `/insperity/` — Insperity benchmark landing page (`insperity/index.html`)
+- `/` redirects to `/insperity/`
 
-`renewal-benchmark.html` extends that page with six example companies and a TriNet benchmark step (savings ranges, ROI and findings). All figures are illustrative placeholders. Everything is built in code, including the rabbit and the gloves. One clock drives the whole trick, so the split view, the x-ray, and the ¼-speed replay always show the same moment.
-
-Controls: Space plays and pauses, ← and → step 0.1 s, R replays the secret at ¼ speed.
-
-`renewal-machine.html` plays a renewal back as a coin machine: the front shows one number, the x-ray shows coins sorting into five cost tubes, the increase landing on top, and an illustrative TriNet benchmark returning coins.
+The earlier rabbit and renewal pages are on the `claude/gallant-babbage-m7o1qd` branch.
