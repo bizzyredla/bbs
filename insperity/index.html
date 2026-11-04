@@ -1,0 +1,674 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Insperity Benchmark</title>
+<meta name="description" content="Benchmark your Insperity bill: what each cost bucket is, where to find it, and your true PEO fee.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=Source+Sans+3:wght@400;500;600;700&display=swap">
+<style>
+:root {
+  --paper: #f6f7f9;
+  --sheet: #ffffff;
+  --ink: #18212b;
+  --muted: #5d6874;
+  --rule: #dfe3e8;
+  --film: #0b1a24;
+  --film-2: #102431;
+  --film-ink: #d9eef6;
+  --film-muted: #87a6b5;
+  --film-rule: #1c3443;
+  --scan: #5fd6f5;
+  --accent: #0e6f8c;
+  --accent-ink: #ffffff;
+  --c1: #5fd6f5; --c2: #f0b54a; --c3: #9a8cf0; --c4: #6fcf97; --c5: #e57fa8;
+  --chip-shop: #8a5a00; --chip-shop-bg: #fbefd6;
+  --shadow: 0 1px 0 var(--rule), 0 18px 50px rgba(10, 25, 35, 0.12);
+  --display: "IBM Plex Sans Condensed", "Arial Narrow", "Roboto Condensed", sans-serif;
+  --body: "Source Sans 3", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #0f1418; --sheet: #172027; --ink: #e8edf1; --muted: #98a4ae; --rule: #26313a;
+    --film: #071219; --film-2: #0c1c26; --film-rule: #183140; --accent: #5fd6f5; --accent-ink: #071219;
+    --chip-shop: #f3cb7a; --chip-shop-bg: #3a2c0e;
+    --shadow: 0 1px 0 var(--rule), 0 18px 50px rgba(0, 0, 0, 0.35);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #0f1418; --sheet: #172027; --ink: #e8edf1; --muted: #98a4ae; --rule: #26313a;
+  --film: #071219; --film-2: #0c1c26; --film-rule: #183140; --accent: #5fd6f5; --accent-ink: #071219;
+  --chip-shop: #f3cb7a; --chip-shop-bg: #3a2c0e;
+  --shadow: 0 1px 0 var(--rule), 0 18px 50px rgba(0, 0, 0, 0.35);
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } *, *::before, *::after { animation: none !important; transition: none !important; } }
+body { margin: 0; background: var(--paper); color: var(--ink); font-family: var(--body); font-size: 16px; line-height: 1.55; -webkit-font-smoothing: antialiased; }
+a { color: var(--accent); }
+.num { font-variant-numeric: tabular-nums; }
+.wrap { max-width: 1180px; margin: 0 auto; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.label { font-family: var(--mono); font-size: 11px; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.skip { position: absolute; left: 16px; top: -48px; z-index: 50; background: var(--ink); color: var(--paper); padding: 8px 12px; border-radius: 4px; }
+.skip:focus { top: 8px; }
+a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visible { outline: 2px solid var(--scan); outline-offset: 2px; }
+
+/* Nav */
+.nav { position: sticky; top: 0; z-index: 20; background: color-mix(in srgb, var(--paper) 88%, transparent); backdrop-filter: saturate(1.4) blur(10px); -webkit-backdrop-filter: saturate(1.4) blur(10px); border-bottom: 1px solid var(--rule); }
+.nav .wrap { display: flex; align-items: center; gap: 24px; min-height: 60px; }
+.brand { display: inline-flex; align-items: center; gap: 10px; font-family: var(--display); font-weight: 700; font-size: 18px; color: var(--ink); text-decoration: none; white-space: nowrap; }
+.brand i { width: 22px; height: 22px; border-radius: 4px; background: linear-gradient(90deg, var(--c1) 0 20%, var(--c2) 20% 40%, var(--c3) 40% 60%, var(--c4) 60% 80%, var(--c5) 80%); }
+.nav ul { list-style: none; display: flex; align-items: center; gap: 4px; margin: 0 0 0 auto; padding: 0; }
+.nav a.link { display: block; color: var(--muted); text-decoration: none; font-size: 15px; font-weight: 600; padding: 6px 10px; border-radius: 4px; white-space: nowrap; }
+.nav a.link:hover { color: var(--ink); background: var(--sheet); }
+.nav a.link[aria-current="true"] { color: var(--ink); }
+.nav a.cta { color: var(--accent-ink); background: var(--accent); margin-left: 6px; }
+.nav a.cta:hover { color: var(--accent-ink); background: var(--accent); filter: brightness(1.08); }
+@media (max-width: 680px) {
+  .nav .wrap { flex-wrap: wrap; gap: 0; padding-block: 8px 6px; min-height: 0; }
+  .nav ul { margin: 4px 0 0 -10px; width: calc(100% + 10px); overflow-x: auto; scrollbar-width: none; }
+  .nav ul::-webkit-scrollbar { display: none; }
+  .nav a.link { font-size: 14px; }
+}
+
+/* Sections */
+section { padding-block: 72px; border-bottom: 1px solid var(--rule); scroll-margin-top: 64px; }
+@media (max-width: 680px) { section { padding-block: 52px; scroll-margin-top: 92px; } }
+.head { display: grid; gap: 10px; max-width: 760px; margin-bottom: 32px; }
+h1 { margin: 0; font-family: var(--display); font-weight: 700; font-size: clamp(36px, 5.6vw, 62px); line-height: 1.02; letter-spacing: -0.015em; text-wrap: balance; }
+h1 span { color: var(--muted); font-weight: 500; }
+h2 { margin: 0; font-family: var(--display); font-weight: 700; font-size: clamp(27px, 3.6vw, 38px); line-height: 1.1; letter-spacing: -0.01em; text-wrap: balance; }
+h3 { margin: 0; font-family: var(--display); font-weight: 600; font-size: 20px; line-height: 1.25; }
+.lede { margin: 0; color: var(--muted); max-width: 62ch; font-size: 18px; text-wrap: pretty; }
+.btn { display: inline-flex; align-items: center; gap: 8px; font: 700 15px var(--body); border-radius: 5px; padding: 12px 20px; text-decoration: none; border: 1px solid var(--accent); background: var(--accent); color: var(--accent-ink); cursor: pointer; transition: transform 0.15s ease, filter 0.15s ease; }
+.btn:hover { filter: brightness(1.08); transform: translateY(-1px); }
+.btn.ghost { background: transparent; color: var(--ink); border-color: var(--rule); }
+.btn.ghost:hover { border-color: var(--muted); }
+.btn svg { width: 16px; height: 16px; }
+.btns { display: flex; flex-wrap: wrap; gap: 10px; }
+
+/* Hero */
+.hero { padding-block: 72px; overflow: hidden; }
+.hero-grid { display: grid; grid-template-columns: minmax(0, 6fr) minmax(0, 5fr); gap: 48px; align-items: center; }
+@media (max-width: 920px) { .hero-grid { grid-template-columns: minmax(0, 1fr); gap: 36px; } }
+.hero .head { margin-bottom: 28px; }
+.xray { position: relative; background: var(--film); color: var(--film-ink); border-radius: 8px; padding: 26px; box-shadow: var(--shadow); overflow: hidden; display: grid; gap: 18px; }
+.xray::after { content: ""; position: absolute; top: 0; bottom: 0; width: 120px; left: -140px; background: linear-gradient(90deg, transparent, rgba(95, 214, 245, 0.18), transparent); pointer-events: none; animation: sweep 2.6s ease-out 0.5s 1; }
+@keyframes sweep { to { left: 110%; } }
+.xray .label { color: var(--scan); }
+.xray .one { border: 1px solid var(--film-rule); border-radius: 5px; padding: 14px 16px; display: flex; justify-content: space-between; align-items: center; gap: 12px; background: var(--film-2); }
+.xray .one b { font-family: var(--display); font-size: 20px; font-weight: 600; }
+.xray .one span { font-family: var(--mono); font-size: 12px; color: var(--film-muted); }
+@media (max-width: 420px) { .xray { padding: 20px; } .xray .one span { display: none; } }
+.xray .arrow { justify-self: center; color: var(--film-muted); }
+.xray ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.xray li { display: grid; grid-template-columns: 12px minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 10px 12px; border-radius: 4px; border: 1px solid var(--film-rule); font-weight: 600; }
+.xray li i { width: 12px; height: 12px; border-radius: 3px; }
+.xray li small { font-family: var(--mono); font-size: 11px; font-weight: 500; color: var(--film-muted); letter-spacing: 0.06em; text-transform: uppercase; }
+.xray li.key { border-color: var(--scan); background: rgba(95, 214, 245, 0.08); }
+.xray li.key small { color: var(--scan); }
+
+/* Why compare */
+.why { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+@media (max-width: 860px) { .why { grid-template-columns: minmax(0, 1fr); } }
+.card { background: var(--sheet); border: 1px solid var(--rule); border-radius: 8px; padding: 22px; display: grid; gap: 8px; align-content: start; }
+.card .n { font-family: var(--display); font-weight: 700; font-size: 30px; line-height: 1; color: var(--muted); }
+.card p { margin: 0; color: var(--muted); }
+
+/* Section 1: bill table */
+.table-wrap { background: var(--sheet); border: 1px solid var(--rule); border-radius: 8px; overflow-x: auto; box-shadow: var(--shadow); }
+table.bill { width: 100%; border-collapse: collapse; font-size: 15px; }
+table.bill th { text-align: left; font-family: var(--mono); font-weight: 500; font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); padding: 14px 18px; border-bottom: 1px solid var(--rule); background: var(--paper); }
+table.bill td { padding: 18px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+table.bill tbody tr:last-child td { border-bottom: 0; }
+table.bill tbody tr { transition: background 0.15s ease; }
+table.bill tbody tr:hover { background: color-mix(in srgb, var(--paper) 60%, transparent); }
+table.bill td:first-child { white-space: nowrap; }
+.bucket { display: inline-flex; align-items: center; gap: 10px; font-family: var(--display); font-weight: 600; font-size: 18px; }
+.bucket i { width: 12px; height: 12px; border-radius: 3px; flex: none; }
+.where { color: var(--muted); }
+.where span { display: inline-block; font-family: var(--mono); font-size: 12px; padding: 2px 7px; margin: 0 4px 4px 0; border: 1px solid var(--rule); border-radius: 3px; background: var(--paper); color: var(--ink); }
+.compare { font-weight: 500; }
+@media (max-width: 760px) {
+  .table-wrap { background: transparent; border: 0; overflow: visible; box-shadow: none; }
+  table.bill, table.bill tbody, table.bill tr, table.bill td { display: block; width: 100%; }
+  table.bill thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+  table.bill tbody tr { background: var(--sheet); border: 1px solid var(--rule); border-radius: 8px; margin-bottom: 12px; padding: 6px 0 8px; }
+  table.bill tbody tr:hover { background: var(--sheet); }
+  table.bill td { border-bottom: 0; padding: 8px 18px; white-space: normal; }
+  table.bill td:first-child { padding-top: 14px; padding-bottom: 4px; }
+  table.bill td:not(:first-child)::before { content: attr(data-label); display: block; font-family: var(--mono); font-size: 11px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
+}
+
+/* Section 2: quick check */
+.qc { display: grid; grid-template-columns: minmax(0, 6fr) minmax(0, 5fr); border-radius: 8px; box-shadow: var(--shadow); align-items: stretch; }
+@media (max-width: 900px) { .qc { grid-template-columns: minmax(0, 1fr); } }
+.qc-in { background: var(--sheet); border: 1px solid var(--rule); border-right: 0; border-radius: 8px 0 0 8px; padding: 28px; display: grid; gap: 22px; align-content: start; }
+@media (max-width: 900px) { .qc-in { border-right: 1px solid var(--rule); border-bottom: 0; border-radius: 8px 8px 0 0; padding: 22px; } }
+.group { display: grid; gap: 14px; border: 0; margin: 0; padding: 0; min-width: 0; }
+.group legend { padding: 0; margin-bottom: 14px; display: flex; align-items: center; gap: 10px; width: 100%; }
+.group legend::after { content: ""; flex: 1; height: 1px; background: var(--rule); }
+.fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
+@media (max-width: 560px) { .fields { grid-template-columns: minmax(0, 1fr); } }
+.field { display: grid; gap: 4px; align-content: start; }
+.field.wide { grid-column: 1 / -1; }
+.field label { font-weight: 700; font-size: 15px; line-height: 1.3; }
+.field .opt { font-weight: 400; color: var(--muted); font-size: 13px; }
+.field .req { color: var(--accent); font-weight: 700; }
+.field .src { font-size: 13px; color: var(--muted); line-height: 1.35; }
+.input { position: relative; margin-top: 4px; }
+.input b { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); font: 500 15px var(--mono); color: var(--muted); pointer-events: none; }
+.input input { font: 500 16px var(--mono); color: var(--ink); background: var(--paper); border: 1px solid var(--rule); border-radius: 4px; padding: 11px 12px 11px 28px; width: 100%; font-variant-numeric: tabular-nums; transition: border-color 0.15s ease, background 0.15s ease; }
+.input.count input { padding-left: 12px; }
+.input input:hover { border-color: var(--muted); }
+.input input:focus { background: var(--sheet); border-color: var(--accent); }
+.fine { margin: 0; font-size: 13px; color: var(--muted); padding: 8px 12px; background: var(--paper); border: 1px solid var(--rule); border-radius: 4px; }
+.fine b { font-family: var(--mono); font-weight: 600; color: var(--ink); }
+.qc-tools { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; font-size: 13px; color: var(--muted); }
+.textbtn { font: 600 14px var(--body); color: var(--accent); background: none; border: 0; padding: 4px 0; cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
+
+.qc-out { background: var(--film); color: var(--film-ink); border-radius: 0 8px 8px 0; padding: 28px; position: relative; }
+@media (max-width: 900px) { .qc-out { border-radius: 0 0 8px 8px; padding: 22px; } }
+.qc-out-inner { position: sticky; top: 84px; display: grid; gap: 18px; }
+.qc-out .label { color: var(--scan); }
+.qc-out a { color: var(--scan); }
+.empty { display: grid; gap: 10px; color: var(--film-muted); border: 1px dashed var(--film-rule); border-radius: 6px; padding: 18px; margin: 0; }
+.empty ul { margin: 0; padding: 0; list-style: none; display: grid; gap: 6px; font-size: 15px; }
+.empty li { display: flex; align-items: center; gap: 10px; }
+.empty li::before { content: ""; width: 14px; height: 14px; border-radius: 50%; border: 1.5px solid var(--film-muted); flex: none; }
+.empty li.done { color: var(--film-ink); }
+.empty li.done::before { background: var(--scan); border-color: var(--scan); }
+.result { border-top: 1px solid var(--film-rule); padding-top: 16px; display: grid; gap: 6px; animation: rise 0.25s ease-out; }
+.result:first-of-type { border-top: 0; padding-top: 0; }
+@keyframes rise { from { opacity: 0; transform: translateY(4px); } }
+.result .stat { font-family: var(--display); font-weight: 600; font-size: 21px; line-height: 1.3; }
+.result .stat b { color: var(--scan); font-weight: 700; }
+.result.primary { background: var(--film-2); border: 1px solid var(--film-rule); border-radius: 6px; padding: 18px; }
+.result.primary .stat { font-size: 24px; }
+.result p { margin: 0; color: var(--film-muted); font-size: 15px; }
+.result .source { font-size: 13px; }
+.band { display: inline-block; justify-self: start; font-family: var(--mono); font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; padding: 3px 8px; border-radius: 3px; }
+.band.low { color: #071219; background: var(--c4); }
+.band.mid { color: #071219; background: var(--c2); }
+.band.high { color: #071219; background: var(--c5); }
+.after { border-top: 1px solid var(--film-rule); padding-top: 18px; display: grid; gap: 12px; }
+.after p { margin: 0; font-size: 15px; }
+.after .tip { color: var(--film-muted); padding-left: 12px; border-left: 2px solid var(--c2); }
+.after .close { font-family: var(--display); font-size: 19px; font-weight: 600; line-height: 1.3; }
+.qc-out .btn { justify-self: start; background: var(--scan); border-color: var(--scan); color: #071219; }
+
+/* Section 3: questions */
+.q-grid { display: grid; grid-template-columns: minmax(0, 4fr) minmax(0, 7fr); gap: 48px; align-items: start; }
+@media (max-width: 860px) { .q-grid { grid-template-columns: minmax(0, 1fr); gap: 8px; } }
+.q-grid .head { position: sticky; top: 92px; margin-bottom: 0; }
+@media (max-width: 860px) { .q-grid .head { position: static; margin-bottom: 20px; } }
+ol.asks { list-style: none; margin: 0; padding: 0; counter-reset: q; display: grid; gap: 10px; }
+ol.asks li { counter-increment: q; display: grid; grid-template-columns: 44px minmax(0, 1fr); gap: 14px; align-items: start; padding: 18px 20px; background: var(--sheet); border: 1px solid var(--rule); border-radius: 8px; font-size: 17px; font-weight: 500; line-height: 1.45; }
+ol.asks li::before { content: counter(q, decimal-leading-zero); font-family: var(--mono); font-weight: 600; font-size: 14px; line-height: 1.8; color: var(--accent); }
+.copy-row { margin-top: 6px; display: flex; align-items: center; gap: 12px; }
+.copied { font-size: 14px; color: var(--muted); }
+
+/* Section 4: stories */
+.stories { display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); gap: 16px; }
+.story { background: var(--sheet); border: 1px solid var(--rule); border-radius: 8px; padding: 24px; display: grid; gap: 16px; align-content: start; }
+.story dl { margin: 0; display: grid; gap: 14px; }
+.story dt { font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+.story dd { margin: 3px 0 0; }
+.story blockquote { margin: 0; padding: 14px 0 0 16px; border-left: 3px solid var(--accent); font-size: 17px; font-weight: 500; }
+.story blockquote cite { display: block; margin-top: 8px; font-style: normal; font-weight: 400; font-size: 14px; color: var(--muted); }
+
+/* Form */
+.form-grid { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: 48px; align-items: start; }
+@media (max-width: 860px) { .form-grid { grid-template-columns: minmax(0, 1fr); gap: 8px; } }
+.form { background: var(--sheet); border: 1px solid var(--rule); border-radius: 8px; padding: 28px; display: grid; gap: 16px; box-shadow: var(--shadow); }
+@media (max-width: 560px) { .form { padding: 20px; } }
+.form .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+@media (max-width: 560px) { .form .row2 { grid-template-columns: 1fr; } }
+.form label { display: grid; gap: 6px; font-weight: 700; font-size: 15px; }
+.form input, .form textarea { font: 400 16px var(--body); color: var(--ink); background: var(--paper); border: 1px solid var(--rule); border-radius: 4px; padding: 11px 12px; width: 100%; transition: border-color 0.15s ease, background 0.15s ease; }
+.form input:focus, .form textarea:focus { background: var(--sheet); border-color: var(--accent); }
+.form textarea { min-height: 110px; resize: vertical; }
+.form .btn { justify-self: start; }
+.hp { position: absolute; left: -9999px; }
+.reply { margin-top: 10px; display: grid; gap: 14px; justify-items: start; }
+.secure { margin: 0; display: flex; gap: 12px; align-items: flex-start; padding: 14px 16px; background: var(--sheet); border: 1px solid var(--rule); border-left: 3px solid var(--accent); border-radius: 6px; font-size: 15px; max-width: 46ch; }
+.secure svg { width: 18px; height: 18px; flex: none; margin-top: 2px; color: var(--accent); }
+
+footer { padding-block: 28px 44px; color: var(--muted); font-size: 14px; border-top: 1px solid var(--rule); }
+footer .wrap { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; }
+footer p { margin: 0; max-width: 80ch; }
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<nav class="nav" aria-label="Page">
+  <div class="wrap">
+    <a class="brand" href="#top"><i aria-hidden="true"></i>Insperity Benchmark</a>
+    <ul>
+      <li><a class="link" href="#why-compare">Why Compare</a></li>
+      <li><a class="link" href="#quick-check">Quick Check</a></li>
+      <li><a class="link cta" href="#get-benchmark">Get My Benchmark</a></li>
+    </ul>
+  </div>
+</nav>
+
+<main id="main">
+
+  <!-- Hero (stand-in: replace with the live page's hero) -->
+  <section class="hero" id="top">
+    <div class="wrap hero-grid">
+      <div>
+        <div class="head">
+          <span class="label">Insperity benchmark</span>
+          <h1>Your Insperity bill is one number. <span>See what's inside it.</span></h1>
+          <p class="lede">A benchmark breaks your Insperity bill into its parts and compares each one.</p>
+        </div>
+        <div class="btns">
+          <a class="btn" href="#get-benchmark">Get My Benchmark</a>
+          <a class="btn ghost" href="#quick-check">Run a Quick Check</a>
+        </div>
+      </div>
+      <figure class="xray" aria-label="One bundled fee, split into five cost buckets" style="margin:0">
+        <span class="label">Your bill, x-rayed</span>
+        <div class="one"><b>One bundled fee</b><span>Insperity invoice</span></div>
+        <svg class="arrow" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 4v16M5 13l7 7 7-7"/></svg>
+        <ul>
+          <li><i style="background:var(--c1)"></i>Payroll taxes<small>Allocation</small></li>
+          <li><i style="background:var(--c2)"></i>Insurance<small>Allocation</small></li>
+          <li><i style="background:var(--c3)"></i>Benefits<small>Allocation</small></li>
+          <li class="key"><i style="background:var(--c4)"></i>PEO fee<small>The number to compare</small></li>
+          <li><i style="background:var(--c5)"></i>Off-cycle charges<small>Allocation</small></li>
+        </ul>
+      </figure>
+    </div>
+  </section>
+
+  <!-- Why Compare (stand-in: replace with the live page's section) -->
+  <section id="why-compare">
+    <div class="wrap">
+      <div class="head">
+        <span class="label">Why compare</span>
+        <h2>Why Compare</h2>
+        <p class="lede">A bundled fee is hard to compare. Split into its parts, each cost can be checked on its own.</p>
+      </div>
+      <div class="why">
+        <div class="card"><span class="n">01</span><h3>Split the bill</h3><p>See each cost bucket and the report it comes from.</p></div>
+        <div class="card"><span class="n">02</span><h3>Find the true fee</h3><p>Separate the PEO fee from taxes, insurance, and benefits.</p></div>
+        <div class="card"><span class="n">03</span><h3>Compare line by line</h3><p>Put each piece next to what it costs elsewhere.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- NEW Section 1 -->
+  <section id="your-bill">
+    <div class="wrap">
+      <div class="head">
+        <span class="label">Your bill</span>
+        <h2>What's in Your Insperity Bill</h2>
+        <p class="lede">Insperity bills one bundled fee, split into allocations. Here's what each piece is, where to find it, and how a benchmark compares it.</p>
+      </div>
+      <div class="table-wrap">
+        <table class="bill">
+          <thead>
+            <tr><th scope="col">Cost bucket</th><th scope="col">What's in it</th><th scope="col">Where it shows up</th><th scope="col">How we compare</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="bucket"><i style="background:var(--c1)"></i>Payroll taxes</span></td>
+              <td data-label="What's in it">FICA, FUTA, state unemployment (SUI), other state taxes</td>
+              <td data-label="Where it shows up" class="where"><span>Cost Analysis Report</span><span>Invoice Reconciliation Report</span></td>
+              <td data-label="How we compare" class="compare">Rebuilt at statutory rates, then compare the SUI rate applied in each state</td>
+            </tr>
+            <tr>
+              <td><span class="bucket"><i style="background:var(--c2)"></i>Insurance</span></td>
+              <td data-label="What's in it">Workers' comp by class code and state, EPLI</td>
+              <td data-label="Where it shows up" class="where"><span>Cost Analysis Report</span><span>Schedule A</span></td>
+              <td data-label="How we compare" class="compare">Workers' comp rate by class code, with EPLI shown separately</td>
+            </tr>
+            <tr>
+              <td><span class="bucket"><i style="background:var(--c3)"></i>Benefits</span></td>
+              <td data-label="What's in it">Medical, dental, vision, life, AD&amp;D, other benefits</td>
+              <td data-label="Where it shows up" class="where"><span>Medical Allocation Report</span><span>Benefit Enrollment Report</span><span>Employee Contributions Report</span></td>
+              <td data-label="How we compare" class="compare">Plan-to-plan match, with total, employer, and employee cost by tier</td>
+            </tr>
+            <tr>
+              <td><span class="bucket"><i style="background:var(--c4)"></i>PEO fee</span></td>
+              <td data-label="What's in it">Admin allocation, Co-Employment Risk, Missed Admin, per-check charges</td>
+              <td data-label="Where it shows up" class="where"><span>Financial Stewardship Report</span><span>Invoice Detail Report</span></td>
+              <td data-label="How we compare" class="compare">Converted to per employee per month and annual</td>
+            </tr>
+            <tr>
+              <td><span class="bucket"><i style="background:var(--c5)"></i>Off-cycle charges</span></td>
+              <td data-label="What's in it">Missed Medical, paid family leave, transit tax</td>
+              <td data-label="Where it shows up" class="where"><span>Invoice Detail Report</span></td>
+              <td data-label="How we compare" class="compare">Annualized from 12 months of invoices</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- NEW Section 2 -->
+  <section id="quick-check">
+    <div class="wrap">
+      <div class="head">
+        <span class="label">Quick check</span>
+        <h2>Quick Check: Your True PEO Fee</h2>
+        <p class="lede">A few numbers from your Insperity reports. Runs in your browser. Nothing is saved or sent.</p>
+      </div>
+
+      <div class="qc">
+        <form class="qc-in" id="qc-form" autocomplete="off" novalidate>
+          <p class="fine"><b>FSR</b> = Financial Stewardship Report, one of your Insperity reports.</p>
+          <fieldset class="group">
+            <legend class="label">Required, monthly</legend>
+            <div class="fields">
+              <div class="field">
+                <label for="qc-employees">Total employees <span class="req" aria-hidden="true">*</span></label>
+                <span class="src" id="h-employees">FSR, "Total Employees"</span>
+                <div class="input count"><input id="qc-employees" data-kind="count" type="text" inputmode="decimal" required aria-describedby="h-employees"></div>
+              </div>
+              <div class="field">
+                <label for="qc-payroll">Monthly payroll <span class="req" aria-hidden="true">*</span></label>
+                <span class="src" id="h-payroll">FSR, "Monthly Payroll"</span>
+                <div class="input"><b aria-hidden="true">$</b><input id="qc-payroll" type="text" inputmode="decimal" required aria-describedby="h-payroll"></div>
+              </div>
+              <div class="field wide">
+                <label for="qc-admin">Admin allocation <span class="req" aria-hidden="true">*</span></label>
+                <span class="src" id="h-admin">FSR, "HR Svcs Compliance Tech &amp; Admin Allocation"</span>
+                <div class="input"><b aria-hidden="true">$</b><input id="qc-admin" type="text" inputmode="decimal" required aria-describedby="h-admin"></div>
+              </div>
+            </div>
+          </fieldset>
+
+          <fieldset class="group">
+            <legend class="label">Optional, monthly</legend>
+            <div class="fields">
+              <div class="field">
+                <label for="qc-risk">Co-Employment Risk <span class="opt">(optional)</span></label>
+                <span class="src" id="h-risk">FSR, "Co-Employment Risk"</span>
+                <div class="input"><b aria-hidden="true">$</b><input id="qc-risk" type="text" inputmode="decimal" aria-describedby="h-risk"></div>
+              </div>
+              <div class="field">
+                <label for="qc-missed-admin">Missed Admin <span class="opt">(optional)</span></label>
+                <span class="src" id="h-missed-admin">Invoice Detail Report, "Missed Admin Amount"</span>
+                <div class="input"><b aria-hidden="true">$</b><input id="qc-missed-admin" type="text" inputmode="decimal" aria-describedby="h-missed-admin"></div>
+              </div>
+              <div class="field">
+                <label for="qc-missed-medical">Missed Medical <span class="opt">(optional)</span></label>
+                <span class="src" id="h-missed-medical">Invoice Detail Report, "Missed Medical Amount"</span>
+                <div class="input"><b aria-hidden="true">$</b><input id="qc-missed-medical" type="text" inputmode="decimal" aria-describedby="h-missed-medical"></div>
+              </div>
+              <div class="field">
+                <label for="qc-family">Employee cost for family coverage <span class="opt">(optional)</span></label>
+                <span class="src" id="h-family">Medical Allocation Report, "EE Monthly Contribution," EE + Family row</span>
+                <div class="input"><b aria-hidden="true">$</b><input id="qc-family" type="text" inputmode="decimal" aria-describedby="h-family"></div>
+              </div>
+            </div>
+          </fieldset>
+
+          <div class="qc-tools">
+            <span><span class="req">*</span> Required</span>
+            <button type="reset" class="textbtn">Clear all</button>
+          </div>
+        </form>
+
+        <div class="qc-out">
+          <div class="qc-out-inner" aria-live="polite">
+            <span class="label">Your results</span>
+
+            <div class="empty" id="qc-empty">
+              <span>Enter the three required numbers to see your results.</span>
+              <ul>
+                <li data-need="employees">Total employees</li>
+                <li data-need="payroll">Monthly payroll</li>
+                <li data-need="admin">Admin allocation</li>
+              </ul>
+            </div>
+
+            <div class="result primary" id="r-fee" hidden>
+              <div class="stat">True PEO fee: <b class="num" id="v-pepm"></b> per employee per month, <b class="num" id="v-annual"></b> per year</div>
+              <p>This is Insperity's actual price for service. Everything else on your bill is taxes, insurance, and benefits that any PEO pays. This is the number to compare.</p>
+            </div>
+            <div class="result" id="r-pct" hidden>
+              <div class="stat">True PEO fee as % of payroll: <b class="num" id="v-pct"></b></div>
+              <p>Useful for comparing quotes priced different ways: per employee, per day, or percent of payroll.</p>
+            </div>
+            <div class="result" id="r-offcycle" hidden>
+              <div class="stat">Off-cycle charges: <b class="num" id="v-offcycle"></b> per year</div>
+              <p>These are billed outside your regular payroll allocations. Ask your rep to itemize them by employee.</p>
+            </div>
+            <div class="result" id="r-family" hidden>
+              <div class="stat">Employee family cost: <b class="num" id="v-family"></b> per year</div>
+              <span class="band" id="v-family-tag"></span>
+              <p id="v-family-band"></p>
+              <p class="source">Source: <a href="https://www.kff.org/health-costs/2026-employer-health-benefits-survey/" target="_blank" rel="noopener">KFF 2026 Employer Health Benefits Survey</a></p>
+            </div>
+
+            <div class="after">
+              <p class="tip">Tip: your FSR's Total Service Fee per employee per month may leave out the admin line. Add it back before comparing.</p>
+              <p class="close">A quick check shows you where to look. A full benchmark shows you what it costs elsewhere.</p>
+              <a class="btn" href="#get-benchmark">Get My Benchmark
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- NEW Section 3 -->
+  <section id="questions">
+    <div class="wrap q-grid">
+      <div class="head">
+        <span class="label">Questions</span>
+        <h2>Questions Worth Asking Your Insperity Rep</h2>
+        <p class="lede">Fair questions any client can ask. The answers make any comparison more accurate.</p>
+        <div class="copy-row">
+          <button type="button" class="btn ghost" id="copy-questions">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h8"/></svg>
+            Copy questions</button>
+          <span class="copied" id="copied" role="status"></span>
+        </div>
+      </div>
+      <ol class="asks" id="asks">
+        <li>What SUI rate are you applying in each state, and is it under your account or ours?</li>
+        <li>What does the Co-Employment Risk allocation fund?</li>
+        <li>Can you itemize Missed Medical and Missed Admin by employee for the last 3 months?</li>
+        <li>Is there a charge for each bonus or off-cycle check?</li>
+        <li>What is our workers' comp rate by class code, separate from EPLI?</li>
+        <li>What is the renewal increase by line: benefits, workers' comp, and admin?</li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- Existing sections from the live page go here, in their current order. -->
+
+  <!-- NEW Section 4: hidden until real, approved stories are added. Remove the hidden attribute to show it. -->
+  <section id="stories" hidden>
+    <div class="wrap">
+      <div class="head">
+        <span class="label">Benchmark stories</span>
+        <h2>Benchmark Stories</h2>
+      </div>
+      <div class="stories">
+        <!--
+        STORY CARD TEMPLATE. Copy this block once per story (up to 3) and replace each [bracketed] field.
+        <article class="story">
+          <dl>
+            <div><dt>Profile</dt><dd>[Profile]</dd></div>
+            <div><dt>What the benchmark found</dt><dd>[What the benchmark found]</dd></div>
+            <div><dt>The decision</dt><dd>[The decision]</dd></div>
+            <div><dt>The result</dt><dd>[The result]</dd></div>
+          </dl>
+          <blockquote>
+            [Quote]
+            <cite>[Name, title, company]</cite>
+          </blockquote>
+        </article>
+        -->
+      </div>
+    </div>
+  </section>
+
+  <!-- Form (stand-in: keep the live page's form, name, and fields) -->
+  <section id="get-benchmark">
+    <div class="wrap form-grid">
+      <div class="head">
+        <span class="label">Get my benchmark</span>
+        <h2>Get My Benchmark</h2>
+        <p class="lede">Reply by email or send a quick note here, and I'll follow up about your benchmark.</p>
+        <div class="reply">
+          
+          <a class="btn" id="reply-email" href="mailto:brandon.ibarra@trinet.com?subject=Insperity%20benchmark&amp;body=Name%3A%20%0ACompany%3A%20%0ANumber%20of%20employees%3A%20%0ABest%20way%20to%20reach%20me%3A%20%0A">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m3 7 9 6 9-6"/></svg>
+            Reply to Email</a>
+          <p class="secure">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+            <span>If you are interested, I can send you a secure portal where you can provide details safely.</span>
+          </p>
+        </div>
+      </div>
+      <form class="form" name="insperity-benchmark" method="POST" data-netlify="true" netlify-honeypot="bot-field">
+        <input type="hidden" name="form-name" value="insperity-benchmark">
+        <p class="hp"><label>Leave this empty <input name="bot-field" tabindex="-1" autocomplete="off"></label></p>
+        <div class="row2">
+          <label>Name <input name="name" autocomplete="name" required></label>
+          <label>Company <input name="company" autocomplete="organization" required></label>
+        </div>
+        <div class="row2">
+          <label>Work email <input name="email" type="email" autocomplete="email" required></label>
+          <label>Phone <input name="phone" type="tel" autocomplete="tel"></label>
+        </div>
+        <label>Number of employees <input name="employees" inputmode="numeric"></label>
+        <label>Anything we should know? <textarea name="message"></textarea></label>
+        <button class="btn" type="submit">Get My Benchmark</button>
+      </form>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <p>Insperity is a trademark of its owner and is named here only to describe the bill being benchmarked.</p>
+  </div>
+</footer>
+
+<script>
+/* Quick Check. Runs entirely in the browser: no storage, cookies, analytics, or network calls. */
+(function () {
+  var ids = ['employees', 'payroll', 'admin', 'risk', 'missed-admin', 'missed-medical', 'family'];
+  var el = function (id) { return document.getElementById(id); };
+  var usd2 = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  var usd0 = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 0 });
+  var grp = new Intl.NumberFormat('en-US', { maximumFractionDigits: 2 });
+  var AVG = 9687, HIGH = 12000;
+
+  function parse(s) { return s.replace(/[$,\s]/g, ''); }
+  function read(id) {
+    var raw = parse(el('qc-' + id).value);
+    if (raw === '') return { entered: false, value: 0 };
+    var n = parseFloat(raw);
+    return { entered: true, value: isFinite(n) ? n : 0 };
+  }
+
+  function update() {
+    var v = {};
+    ids.forEach(function (id) { v[id] = read(id); });
+    var employees = v.employees.value, payroll = v.payroll.value, admin = v.admin.value;
+    var ready = employees > 0 && payroll > 0 && admin > 0;
+
+    document.querySelectorAll('[data-need]').forEach(function (li) {
+      li.classList.toggle('done', v[li.getAttribute('data-need')].value > 0);
+    });
+    el('qc-empty').hidden = ready;
+    ['r-fee', 'r-pct', 'r-offcycle', 'r-family'].forEach(function (id) { el(id).hidden = true; });
+    if (!ready) return;
+
+    var trueFeeMonthly = admin + v.risk.value + v['missed-admin'].value;
+    var pepm = trueFeeMonthly / employees;
+    var annualFee = trueFeeMonthly * 12;
+    var pctOfPayroll = trueFeeMonthly / payroll * 100;
+    var offCycleAnnual = (v['missed-medical'].value + v['missed-admin'].value) * 12;
+    var familyAnnual = v.family.value * 12;
+
+    el('v-pepm').textContent = usd2.format(pepm);
+    el('v-annual').textContent = usd0.format(annualFee);
+    el('r-fee').hidden = false;
+
+    el('v-pct').textContent = pctOfPayroll.toFixed(2) + '%';
+    el('r-pct').hidden = false;
+
+    if (offCycleAnnual > 0) {
+      el('v-offcycle').textContent = usd0.format(offCycleAnnual);
+      el('r-offcycle').hidden = false;
+    }
+
+    if (v.family.entered && familyAnnual > 0) {
+      el('v-family').textContent = usd0.format(familyAnnual);
+      var band, tag, cls;
+      if (familyAnnual < AVG) { band = 'Below the 2026 small-firm average of $9,687 a year for family coverage.'; tag = 'Below average'; cls = 'low'; }
+      else if (familyAnnual < HIGH) { band = 'Above the 2026 small-firm average of $9,687 a year for family coverage.'; tag = 'Above average'; cls = 'mid'; }
+      else { band = 'In the high-cost group. 31% of covered workers at smaller firms are in plans where family coverage costs the worker $12,000 or more a year.'; tag = 'High-cost group'; cls = 'high'; }
+      el('v-family-band').textContent = band;
+      var t = el('v-family-tag'); t.textContent = tag; t.className = 'band ' + cls;
+      el('r-family').hidden = false;
+    }
+  }
+
+  ids.forEach(function (id) {
+    var input = el('qc-' + id);
+    input.addEventListener('input', update);
+    /* Tidy the number on blur: add thousands separators, keep what was typed otherwise. */
+    input.addEventListener('blur', function () {
+      var raw = parse(input.value);
+      if (raw === '' || !isFinite(parseFloat(raw)) || !/^-?\d*\.?\d*$/.test(raw)) return;
+      var n = parseFloat(raw);
+      input.value = input.getAttribute('data-kind') === 'count' ? grp.format(n)
+        : (raw.indexOf('.') > -1 ? n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : grp.format(n));
+    });
+  });
+  el('qc-form').addEventListener('reset', function () { setTimeout(update, 0); });
+  el('qc-form').addEventListener('submit', function (e) { e.preventDefault(); });
+  update();
+
+  /* Copy questions to the clipboard (local only). */
+  var copyBtn = el('copy-questions');
+  copyBtn.addEventListener('click', function () {
+    var text = Array.prototype.map.call(document.querySelectorAll('#asks li'), function (li, i) { return (i + 1) + '. ' + li.textContent.trim(); }).join('\n');
+    var done = function () { el('copied').textContent = 'Copied. Paste into an email to your rep.'; };
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(done, fallback);
+    else fallback();
+    function fallback() {
+      var ta = document.createElement('textarea'); ta.value = text; ta.setAttribute('readonly', ''); ta.style.position = 'absolute'; ta.style.left = '-9999px';
+      document.body.appendChild(ta); ta.select();
+      try { document.execCommand('copy'); done(); } catch (e) { el('copied').textContent = 'Select the questions to copy them.'; }
+      document.body.removeChild(ta);
+    }
+  });
+
+  /* Highlight the nav link for the section in view. */
+  var links = document.querySelectorAll('.nav a.link[href^="#"]');
+  if ('IntersectionObserver' in window) {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) {
+        if (!en.isIntersecting) return;
+        links.forEach(function (a) { a.setAttribute('aria-current', a.getAttribute('href') === '#' + en.target.id ? 'true' : 'false'); });
+      });
+    }, { rootMargin: '-45% 0px -50% 0px' });
+    document.querySelectorAll('main section[id]').forEach(function (s) { io.observe(s); });
+  }
+})();
+</script>
+</body>
+</html>
