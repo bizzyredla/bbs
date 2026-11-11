@@ -1,0 +1,171 @@
+/* Covalent brand tokens, shared by the marketing site (index.html) and the product prototype (app.html).
+   Concept: two parties (vendor = cobalt, partner = tangerine) bonded by one shared record (ink).
+   Cobalt and tangerine double as the two chart series: partner-sourced vs partner-influenced. */
+:root {
+  --paper: #f3f4f7;
+  --sheet: #ffffff;
+  --sunk: #e9ebf0;
+  --ink: #14151f;
+  --ink-2: #3a3e4e;
+  --muted: #676c7e;
+  --rule: #dcdfe7;
+  --rule-strong: #c6cad6;
+
+  --cobalt: #2f4bef;
+  --cobalt-strong: #2238c8;
+  --cobalt-soft: #e5e9fe;
+  --cobalt-ink: #ffffff;
+  --tangerine: #f2643a;
+  --tangerine-strong: #c94418;
+  --tangerine-soft: #fde8e0;
+
+  --good: #17885a;
+  --good-soft: #def3e9;
+  --warn: #a8700a;
+  --warn-soft: #fbf0d6;
+  --crit: #cc3a30;
+  --crit-soft: #fbe3e1;
+
+  --shadow-sm: 0 1px 2px rgba(20, 21, 31, 0.06), 0 1px 0 rgba(20, 21, 31, 0.04);
+  --shadow: 0 1px 0 var(--rule), 0 14px 40px rgba(20, 24, 50, 0.08);
+  --shadow-lg: 0 30px 80px rgba(20, 24, 60, 0.16);
+  --lens-blend: multiply;
+
+  --display: "Bricolage Grotesque", "Avenir Next", "Segoe UI", system-ui, sans-serif;
+  --body: "Geist", "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: "Geist Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+
+  --r-sm: 6px;
+  --r: 10px;
+  --r-lg: 16px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #0e0f16;
+    --sheet: #161823;
+    --sunk: #1d2030;
+    --ink: #eceef5;
+    --ink-2: #c3c7d4;
+    --muted: #9196a8;
+    --rule: #2a2d3d;
+    --rule-strong: #3a3e52;
+    --cobalt: #7088ff;
+    --cobalt-strong: #93a5ff;
+    --cobalt-soft: #1f2552;
+    --cobalt-ink: #0e0f16;
+    --tangerine: #e0663a;
+    --tangerine-strong: #ff9a75;
+    --tangerine-soft: #3a2018;
+    --good: #4cc792;
+    --good-soft: #143326;
+    --warn: #e2b04a;
+    --warn-soft: #3a2d10;
+    --crit: #ff7a70;
+    --crit-soft: #3d1a18;
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+    --shadow: 0 1px 0 var(--rule), 0 14px 40px rgba(0, 0, 0, 0.35);
+    --shadow-lg: 0 30px 80px rgba(0, 0, 0, 0.5);
+    --lens-blend: screen;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #0e0f16;
+  --sheet: #161823;
+  --sunk: #1d2030;
+  --ink: #eceef5;
+  --ink-2: #c3c7d4;
+  --muted: #9196a8;
+  --rule: #2a2d3d;
+  --rule-strong: #3a3e52;
+  --cobalt: #7088ff;
+  --cobalt-strong: #93a5ff;
+  --cobalt-soft: #1f2552;
+  --cobalt-ink: #0e0f16;
+  --tangerine: #e0663a;
+  --tangerine-strong: #ff9a75;
+  --tangerine-soft: #3a2018;
+  --good: #4cc792;
+  --good-soft: #143326;
+  --warn: #e2b04a;
+  --warn-soft: #3a2d10;
+  --crit: #ff7a70;
+  --crit-soft: #3d1a18;
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --shadow: 0 1px 0 var(--rule), 0 14px 40px rgba(0, 0, 0, 0.35);
+  --shadow-lg: 0 30px 80px rgba(0, 0, 0, 0.5);
+  --lens-blend: screen;
+  color-scheme: dark;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--body);
+  font-size: 15px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+h1, h2, h3, h4 { font-family: var(--display); line-height: 1.08; margin: 0; text-wrap: balance; letter-spacing: -0.02em; }
+p { margin: 0; }
+a { color: inherit; }
+button, input, select, textarea { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--cobalt); outline-offset: 2px; border-radius: 4px; }
+.num, .mono { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+.eyebrow {
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* Logo mark: two overlapping circles, the lens where they meet is the shared record */
+.mark { display: inline-block; width: 28px; height: 20px; flex: none; }
+.mark .a { fill: var(--cobalt); }
+.mark .b { fill: var(--tangerine); }
+.mark .lens { fill: var(--ink); }
+.wordmark { display: inline-flex; align-items: center; gap: 9px; font-family: var(--display); font-weight: 700; font-size: 19px; letter-spacing: -0.02em; text-decoration: none; color: var(--ink); }
+
+/* Buttons */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  height: 40px; padding: 0 16px; border-radius: 999px;
+  border: 1px solid var(--rule-strong); background: var(--sheet); color: var(--ink);
+  font-weight: 600; font-size: 14px; text-decoration: none; cursor: pointer;
+  transition: transform .15s ease, background .15s ease, border-color .15s ease;
+  white-space: nowrap;
+}
+.btn:hover { border-color: var(--ink-2); }
+.btn:active { transform: translateY(1px); }
+.btn.primary { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+.btn.primary:hover { background: var(--ink-2); }
+.btn.cobalt { background: var(--cobalt); color: var(--cobalt-ink); border-color: var(--cobalt); }
+.btn.cobalt:hover { background: var(--cobalt-strong); border-color: var(--cobalt-strong); }
+.btn.sm { height: 32px; padding: 0 12px; font-size: 13px; }
+.btn.ghost { background: transparent; border-color: transparent; }
+.btn.ghost:hover { background: var(--sunk); }
+
+/* Pills and chips */
+.pill {
+  display: inline-flex; align-items: center; gap: 6px;
+  height: 22px; padding: 0 9px; border-radius: 999px;
+  font-size: 12px; font-weight: 600; white-space: nowrap;
+  background: var(--sunk); color: var(--ink-2);
+}
+.pill::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; opacity: .9; }
+.pill.plain::before { display: none; }
+.pill.cobalt { background: var(--cobalt-soft); color: var(--cobalt-strong); }
+.pill.tangerine { background: var(--tangerine-soft); color: var(--tangerine-strong); }
+.pill.good { background: var(--good-soft); color: var(--good); }
+.pill.warn { background: var(--warn-soft); color: var(--warn); }
+.pill.crit { background: var(--crit-soft); color: var(--crit); }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; scroll-behavior: auto !important; }
+}

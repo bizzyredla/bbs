@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Covalent Workspace</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<meta name="description" content="Interactive prototype of the Covalent partner relationship platform, with sample data.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="brand.css">
+<link rel="stylesheet" href="app.css">
+</head>
+<body>
+<div class="shell" id="shell">
+  <aside class="side" aria-label="Workspace navigation">
+    <div class="side-head">
+      <a class="wordmark" href="index.html" title="Back to the Covalent site">
+        <svg class="mark" viewBox="0 0 28 20" aria-hidden="true"><circle class="a" cx="10" cy="10" r="9"/><circle class="b" cx="18" cy="10" r="9"/><path class="lens" d="M14 1.94 A9 9 0 0 1 14 18.06 A9 9 0 0 1 14 1.94Z"/></svg>
+        Covalent
+      </a>
+    </div>
+    <div class="mode" role="group" aria-label="Choose whose view to show">
+      <button type="button" id="mode-vendor" aria-pressed="true">Fieldnote team</button>
+      <button type="button" id="mode-partner" aria-pressed="false">Partner view</button>
+    </div>
+    <nav class="side-nav" id="side-nav"></nav>
+    <div class="side-foot" id="side-foot"></div>
+  </aside>
+
+  <div class="main">
+    <header class="top">
+      <div class="search">
+        <svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="9" cy="9" r="6" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M13.5 13.5 L17 17" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+        <label for="q" class="sr">Search partners and deals</label>
+        <input id="q" type="search" placeholder="Search partners and deals" autocomplete="off">
+        <kbd>/</kbd>
+        <div class="search-results" id="search-results" hidden></div>
+      </div>
+      <span class="top-spacer"></span>
+      <span class="sample-tag">Sample workspace</span>
+      <button type="button" class="btn sm" id="theme-btn" aria-label="Switch color theme">Theme</button>
+      <button type="button" class="btn sm cobalt" id="copilot-btn"><span aria-hidden="true">✦</span> Copilot</button>
+    </header>
+    <main class="view" id="view" tabindex="-1"></main>
+  </div>
+</div>
+
+<div class="scrim" id="scrim" hidden></div>
+<aside class="drawer" id="drawer" aria-label="Details" hidden></aside>
+
+<aside class="copilot" id="copilot" aria-label="Covalent Copilot" hidden>
+  <div class="copilot-head">
+    <b><span aria-hidden="true">✦</span> Copilot</b>
+    <button type="button" class="btn sm ghost" id="copilot-close" aria-label="Close Copilot">Close</button>
+  </div>
+  <div class="copilot-log" id="copilot-log" aria-live="polite"></div>
+  <div class="copilot-chips" id="copilot-chips"></div>
+  <form class="copilot-form" id="copilot-form">
+    <label for="copilot-input" class="sr">Ask Copilot</label>
+    <input id="copilot-input" placeholder="Ask about partners, deals or payouts" autocomplete="off">
+    <button class="btn sm primary" type="submit">Ask</button>
+  </form>
+</aside>
+
+<div class="toasts" id="toasts" aria-live="polite"></div>
+
+<script src="data.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

@@ -11,3 +11,8 @@
   from = "/insperity"
   to = "/insperity/"
   status = 301
+
+[[redirects]]
+  from = "/covalent"
+  to = "/covalent/"
+  status = 301
